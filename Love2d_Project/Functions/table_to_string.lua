@@ -1,3 +1,4 @@
+-- this is temporary debug tool and not optimized
 local function table_to_string(Table,Name)
     Name = Name or "table"
     local result = Name .. " = {\n";
