@@ -1,20 +1,5 @@
-Enumerate = {
-    EasingStyle = {
-        Linear = 0,
-        Sine = 1,
-    },
-    EasingDirection = {
-        In = 0,
-        Out = 1,
-        InOut = 2,
-    },
-    PlaybackState = {
-        Normal = 0,
-        Playing = 1,
-        Paused = 2,
-        Completed = 3,
-    };
-};
+
+Enumerate = require("Modules/enumerate");
 
 Print = print;
 Type = type;
@@ -48,8 +33,6 @@ Instance = require("Modules/instance");
 
 Tween = require("Modules/tween");
 TweenInfo = Tween.TweenInfo;
-
-
 
 function love.draw()
     love.graphics.print("hello world",100,100)
