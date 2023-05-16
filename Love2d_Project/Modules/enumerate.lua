@@ -2,6 +2,7 @@ local Enumerate = {
     EasingStyle = {
         Linear = 0,
         Sine = 1,
+        Elastic = 2,
     },
     EasingDirection = {
         In = 0,

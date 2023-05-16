@@ -2,10 +2,13 @@
 
 local Type = type;
 local function newType(Object)
-    if Object.Type then 
-        return Object.Type;
+    local TypeOf = Type(Object);
+    if TypeOf == "table" then 
+        if Object.Type then
+            return Object.Type;
+        end
     end
-    return Type(Object);
+    return TypeOf;
 end
 
 return newType;

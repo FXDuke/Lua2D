@@ -32,6 +32,22 @@ local EasingInfo = {
             return -(math.cos(math.pi * Alpha) - 1) / 2;
         end,
     },
+    [2] = {
+        [0] = function(Alpha)
+            local c4 = (2 * math.pi) / 3;
+            return Alpha == 0 and 0 or Alpha == 1 and 1 or -math.pow(2, 10 * Alpha - 10) * math.sin((Alpha * 10 - 10.75) * c4);
+        end,
+        [1] = function(Alpha)
+            local c4 = (2 * math.pi) / 3;
+
+            return Alpha == 0 and 0 or Alpha == 1 and 1 or math.pow(2, -10 * Alpha) * math.sin((Alpha * 10 - 0.75) * c4) + 1;
+        end,
+        [2] = function(Alpha)
+            local c5 = (2 * math.pi) / 4.5;
+
+            return Alpha == 0 and 0 or Alpha == 1 and 1 or Alpha < 0.5 and -(math.pow(2, 20 * Alpha - 10) * math.sin((20 * Alpha - 11.125) * c5)) / 2 or (math.pow(2, -20 * Alpha + 10) * math.sin((20 * Alpha - 11.125) * c5)) / 2 + 1;
+        end,
+    },
 };
 
 
@@ -73,6 +89,7 @@ function Tween:Create(Object,TweenInfo,PropertyTable)
                 end
                 TweenInfo.RepeatCount = TweenInfo.RepeatCount - 1;
             end 
+            l__tweenObject.Completed:Fire();
             l__tweenObject:Close();
         end),
         PlaybackState = Enumerate.PlaybackState.Normal,

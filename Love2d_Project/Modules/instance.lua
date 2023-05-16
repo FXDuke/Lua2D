@@ -1,4 +1,9 @@
 local Instances = {};
+local Trees = {
+    ["Part"] = "WorldObject",
+    ["TextBox"] = "UI",
+    ["Folder"] = "Object",
+};
 
 function __DebugGetSelf(Object)
     return Instances[Object.ID];
@@ -71,15 +76,20 @@ end
 
 
 local Instance = {
+    getInstances = function()
+        return Instances;
+    end,
     new = function(Type)
 
         -- Applying Root Class
 
         Type = Type or "Folder";
+        local Branch = Trees[Type];
 
         local ID = #Instances+1;
         Instances[ID] = setmetatable({
-            Type = "Object",
+            Type = Type,
+            Class = Branch,
             ID = ID,
             __Children = {},
             __Attributes = {
@@ -99,18 +109,23 @@ local Instance = {
         l__Attr.ClassName = Type;
         l__Attr.Name = Type;
 
-        if Type == "Object" then 
+        if Branch == "WorldObject" then 
             l__Attr.Position = Vector2.new(0,0);
             l__Attr.Size = Vector2.new(0,0);
-            --l__Attr.Color3 = true;
-            l__Attr.Transparency = 0;
-        elseif Type == "UI" then
-            l__Attr.Position = Vector2.new(0,0); 
-            l__Attr.Size = Vector2.new(0,0);
+            l__Attr.Color3 = Color3.new(255,255,255);
+            l__Attr.Opacity = 1;
+        elseif Branch == "UI" then
+            l__Attr.Position = UDim2.new(0,0,0,0); 
+            l__Attr.Size = UDim2.new(0,50,0,50);
             l__Attr.Enabled = true;
             l__Attr.Visible = true;
-            --l__Attr.Color3 = true;
-            l__Attr.Transparency = 0;
+            l__Attr.BackgroundColor3 = Color3.new(255,255,255);
+            l__Attr.BackgroundOpacity = 1;
+            if Type == "TextBox" then 
+                l__Attr.Text = "Textbox";
+                l__Attr.TextColor3 = Color3.new(0,0,0);
+                l__Attr.FontSize = 14;
+            end
         end 
 
         -- Creating Proxy
