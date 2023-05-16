@@ -149,14 +149,14 @@ local Instance = {
             end,
             __newindex = function(self,Index,Value)
                 if Index == "Parent" then 
-                    if Instances[self.ID].Parent then 
+                    if l__Attr.Parent then 
                         local l__proxy = setmetatable({ID=self.ID,ProxyID=self.ProxyID},self);
                         Instances[self.ID].ChildRemoved:Fire(Instances[self.ID]);
-                        rawset(Instances[self.ID].Parent.__Children,self.ProxyID,nil);
+                        rawset(l__Attr.Parent.__Children,self.ProxyID,nil);
                         self = l__proxy;
                     end
                     if Value.ClassName then 
-                        Instances[self.ID].Parent = Value;
+                        l__Attr.Parent = Value;
                         Value.__Children[self.ProxyID] = self;
                         Value.__Events.ChildAdded:Fire(Instances[self.ID]);
                     else

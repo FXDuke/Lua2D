@@ -42,12 +42,20 @@ TweenInfo = Tween.TweenInfo;
 
 UI_Drawing = require("Modules/ui_drawing");
 
+local myObject = Instance.new("Part")
+local myFolder = Instance.new("Folder")
+myFolder.Parent = myObject;
+myFolder.Name = "Totally_Not_A_Bomb..."
+
+love.graphics.setBackgroundColor(0,0,0);
 function love.draw()
     for _,l__Instance in pairs(Instance.getInstances()) do 
         if l__Instance.Class == "UI" then
             UI_Drawing[l__Instance.Type](l__Instance);
         end
     end
+    love.graphics.print(table_to_string(myObject.__index),10,10)
+    love.graphics.print(table_to_string(myObject["Totally_Not_A_Bomb..."].__index),10,300)
 end
 
 function love.update(DeltaTime)
