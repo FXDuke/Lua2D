@@ -2,6 +2,8 @@ NOTES FOR THIS UPDATE
 
 * Added Studio_UI.lua, which will be the groundworks for making the UI for the game editor,
 * Added ZIndex to UI Class,
+* Added Enumerate ZIndexBehavior (Sibling and Global),
+Added Enumerate ZIndexBehavior to UI Class,
 Added AbsolutePosition to UI Class,
 Added AbsoluteSize to UI Class,
 

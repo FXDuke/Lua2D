@@ -123,6 +123,7 @@ local Instance = {
             l__Attr.AbsolutePosition = {0,0};
             l__Attr.AbsoluteSize = {50,50}; 
             --***** need to add something that updates this in either __index or __newnidex
+            l__Attr.ZIndexBehavior = Enumerate.ZIndexBehavior.Sibling;
             l__Attr.Enabled = true;
             l__Attr.Visible = true;
             l__Attr.BackgroundColor3 = Color3.new(255,255,255);

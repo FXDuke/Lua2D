@@ -14,7 +14,11 @@ local Enumerate = {
         Playing = 1,
         Paused = 2,
         Completed = 3,
-    };
+    },
+    ZIndexBehavior = {
+        Sibling = 0,
+        Global = 1,
+    },
 };
 
 return Enumerate;
