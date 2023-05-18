@@ -40,7 +40,7 @@ Instance = require("Modules/instance");
 Tween = require("Modules/tween");
 TweenInfo = Tween.TweenInfo;
 
-STUDIO_UI = require("Module/studio_ui");
+STUDIO_UI = require("Modules/studio_ui");
 
 UI_Drawing = require("Modules/ui_drawing");
 
