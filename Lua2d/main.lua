@@ -44,17 +44,12 @@ STUDIO_UI = require("Modules/studio_ui");
 
 UI_Drawing = require("Modules/ui_drawing");
 
-local myObject = Instance.new("Part")
-myObject.Name = "MyPart!!! sadjhasdjasdh djhfkjha";
-local myFolder = Instance.new("Folder")
-myFolder.Parent = myObject;
-myFolder.Name = "Totally Not A Bomb..."
-
-local a = Vector2.new(10,10);
-local b = Vector2.new(100,100);
-print(a+10);
-
-
+local MyObject = Instance.new("Part");
+local a = MyObject.Position;
+local b = MyObject.Size;
+local c = Vector2.new(100,100);
+Tween:Create(MyObject,TweenInfo.new(5,Enumerate.EasingStyle.Sine),{Position=c}):Play();
+Tween:Create(MyObject,TweenInfo.new(5,Enumerate.EasingStyle.Sine),{Size=c}):Play();
 
 
 love.graphics.setBackgroundColor(0,0,0);
@@ -66,8 +61,8 @@ function love.draw()
             end
         end
     end
-    love.graphics.print(table_to_string(myObject.__index,myObject.Name),10,10)
-    love.graphics.print(table_to_string(myObject["Totally Not A Bomb..."].__index,myObject["Totally Not A Bomb..."].Name),10,300)
+    love.graphics.print("Position: " .. tostring(MyObject.Position) .. "\nOrigin:    " .. tostring(a),10,10);
+    love.graphics.print("Size:       " .. tostring(MyObject.Size) .. "\nOrigin:    " .. tostring(b),10,50);
 end
 
 function love.update(DeltaTime)

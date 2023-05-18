@@ -1,19 +1,4 @@
 NOTES FOR THIS UPDATE
 
-* Added Studio_UI.lua, which will be the groundworks for making the UI for the game editor,
-* Added ZIndex to UI Class,
-* Added Enumerate ZIndexBehavior (Sibling and Global),
-Added Enumerate ZIndexBehavior to UI Class,
-Added AbsolutePosition to UI Class,
-Added AbsoluteSize to UI Class,
-
-Added check for Enabled and Visible when drawing objects with the UI class
-
-NOTES: 
-
-* Added note to Instance.lua to add something that automatically update absolutesize and absoulteposition with __index or __newindex in the future.
-
-* Added note to table_to_string so people stop point that out as an ineffeciency. (It is a temporary debug tool until I get the
-output UI working and make something optimized.)
-
-Added notes to Main.lua to add ZIndex to the drawing
+Fixed operation methods for all types,
+Fixed TweenService waiting before adding value (resulting in last value in dictionary being 1 step from completion)

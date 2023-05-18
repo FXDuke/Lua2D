@@ -113,7 +113,7 @@ local Instance = {
 
         if Branch == "WorldObject" then 
             l__Attr.Position = Vector2.new(0,0);
-            l__Attr.Size = Vector2.new(0,0);
+            l__Attr.Size = Vector2.new(50,20);
             l__Attr.Color3 = Color3.new(255,255,255);
             l__Attr.Opacity = 1;
         elseif Branch == "UI" then

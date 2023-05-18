@@ -81,11 +81,11 @@ function Tween:Create(Object,TweenInfo,PropertyTable)
                 local Alpha = 0;
                 local Start = os.clock();
                 while Alpha < 1 do
-                    Thread:Wait();
                     Alpha = Tween.GetAlpha((os.clock()-Start)/TweenInfo.Time,TweenInfo.EasingStyle,TweenInfo.EasingDirection);
                     for _,Property in pairs(PropertyTable) do 
                         Object[_] = Differences[_].Origin + (Differences[_].Goal*Alpha);
                     end
+                    Thread:Wait();
                 end
                 TweenInfo.RepeatCount = TweenInfo.RepeatCount - 1;
             end 
