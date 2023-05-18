@@ -50,6 +50,11 @@ local myFolder = Instance.new("Folder")
 myFolder.Parent = myObject;
 myFolder.Name = "Totally Not A Bomb..."
 
+local a = Vector2.new(10,10);
+local b = Vector2.new(100,100);
+print(a+10);
+
+
 
 
 love.graphics.setBackgroundColor(0,0,0);
