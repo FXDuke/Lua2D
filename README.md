@@ -1,4 +1,4 @@
 # Lua2D
-This is me putting every neuron I have left to the test and trying to make a game engine with love2d.
+Lua2d is a game editor inspired by Roblox's Roblox Studio. Its aim is to provide the same simplicity that Roblox provides and get users inspired to develop games.
 
 See Lua2d/UpdateNotes for updates
