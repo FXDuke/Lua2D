@@ -21,6 +21,10 @@ UI Class:
     - Button2Up:     Event
 }
 
+UI Drawing:
+
+- Button Type
+
 Mouse: (See Modules/mouse)
 
 - Hit:              Instance,   The instance the mouse is over
@@ -47,8 +51,15 @@ UI Class:
 
 - Auto Scales after Window is resized
 
+UI Drawing:
+
+Made standard UI drawing the default drawing function to improve performance
 
 FIXES:
+
+Tweens:
+
+Made it so if you have a tween already running for an object it gets cancelled when you start a new one
 
 Types:
 
