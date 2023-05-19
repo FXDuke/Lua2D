@@ -1,10 +1,22 @@
 local Instances = {};
+local DrawOrder = {};
+
+local function Update_Draw_Order()
+    DrawOrder = {};
+    for _,UIObject in pairs(ui_service:GetDescendants()) do 
+        local ZIndex = UIObject.ZIndex;
+        DrawOrder[ZIndex] = DrawOrder[ZIndex] or {};
+        table.insert(DrawOrder[ZIndex],UIObject);
+    end
+end
+
 local Trees = {
     ["Part"] = "WorldObject",
     ["TextBox"] = "UI",
     ["UI"] = "UI",
     ["Object"] = "Object",
     ["Folder"] = "Object",
+    ["Button"] = "UI",
 };
 
 function __DebugGetSelf(Object)
@@ -16,7 +28,6 @@ l__Instance.__index = l__Instance;
 
 
 function l__Instance:FindFirstChild(Name)
-    self = (self.ProxyID) and __DebugGetSelf(self) or self;
     for _,Child in pairs(self.__Children) do 
         if Child.Name == Name then 
             return Child;
@@ -26,7 +37,6 @@ function l__Instance:FindFirstChild(Name)
 end
 
 function l__Instance:WaitForChild(Name)
-    self = (self.ProxyID) and __DebugGetSelf(self) or self;
     local Child = self:FindFirstChild(Name);
     if (Child == nil) then 
         local Yield_Limit = os.clock()+10;
@@ -38,13 +48,14 @@ function l__Instance:WaitForChild(Name)
                     return Child;
                 end;
             until os.clock > Yield_Limit;
-            error(self.Name,"Possible infinite yield waiting for child " .. Name, debug.traceback()); 
+            error(self.Name,"Possible infinite yield waiting for child " .. Name); 
         end):Play();
+    else 
+        return Child;
     end
 end
 
 function l__Instance:FindFirstAncestor(Name)
-    self = (self.ProxyID) and __DebugGetSelf(self) or self;
     if self.Parent then 
         if self.Parent.Name == Name then
             return self.Parent;
@@ -57,8 +68,21 @@ function l__Instance:FindFirstAncestor(Name)
 end
 
 function l__Instance:GetChildren()
-    self = (self.ProxyID) and __DebugGetSelf(self) or self;
     return self.__Children;
+end
+
+function l__Instance:GetDescendants()
+    local Descendants = {};
+
+    local function Loop_Children(Object)
+        for _,Child in pairs(Object:GetChildren()) do
+            table.insert(Descendants,Child);
+            Loop_Children(Child);
+        end
+    end
+
+    Loop_Children(self);
+    return Descendants;
 end
 
 function l__Instance:Destroy()
@@ -80,6 +104,9 @@ end
 local Instance = {
     getInstances = function()
         return Instances;
+    end,
+    getDrawOrder = function()
+        return DrawOrder;
     end,
     new = function(Type)
 
@@ -108,6 +135,7 @@ local Instance = {
         -- Applying Class
 
         local l__Attr = Instances[ID].__Attributes;
+        local l__Ev = Instances[ID].__Events;
         l__Attr.ClassName = Type;
         l__Attr.Name = Type;
 
@@ -119,20 +147,44 @@ local Instance = {
         elseif Branch == "UI" then
             l__Attr.Position = UDim2.new(0,0,0,0); 
             l__Attr.Size = UDim2.new(0,50,0,50);
-            --***** need to add something that updates this in either __index or __newnidex 
-            l__Attr.AbsolutePosition = {0,0};
-            l__Attr.AbsoluteSize = {50,50}; 
-            --***** need to add something that updates this in either __index or __newnidex
+            l__Attr.AbsolutePosition = Vector2.new(0,0);
+            l__Attr.AbsoluteSize = Vector2.new(0,50); 
             l__Attr.ZIndexBehavior = Enumerate.ZIndexBehavior.Sibling;
             l__Attr.Enabled = true;
             l__Attr.Visible = true;
             l__Attr.BackgroundColor3 = Color3.new(255,255,255);
             l__Attr.BackgroundOpacity = 1;
             l__Attr.ZIndex = 1;
+            l__Attr.ScaleType = Enumerate.ScaleType.Sibling;
+            l__Ev.MouseEnter = createConnection();
+            l__Ev.MouseLeave = createConnection();
+
+            l__Ev.Changed:Connect(function(self, Index)
+                if (Index == "Position") and l__Attr.Parent then
+                    local Position = l__Attr.Position;
+                    local X = (l__Attr.ScaleType == 0) and WINDOW_WIDTH*Position.X.Scale or l__Attr.Parent.AbsolutePosition.X+l__Attr.Parent.AbsoluteSize.X*Position.X.Scale;
+                    local Y = (l__Attr.ScaleType == 0) and WINDOW_HEIGHT*Position.Y.Scale or l__Attr.Parent.AbsolutePosition.Y+l__Attr.Parent.AbsoluteSize.Y*Position.Y.Scale;
+                    l__Attr.AbsolutePosition = Vector2.new(Position.X.Offset+X, Position.Y.Offset+Y);
+                elseif (Index == "Size") and l__Attr.Parent then 
+                    local Size = l__Attr.Size;
+                    local X = (l__Attr.ScaleType == 0) and WINDOW_WIDTH or l__Attr.Parent.AbsoluteSize.X;
+                    local Y = (l__Attr.ScaleType == 0) and WINDOW_HEIGHT or l__Attr.Parent.AbsoluteSize.Y;
+                    l__Attr.AbsoluteSize = Vector2.new(Size.X.Offset+X*Size.X.Scale,Size.Y.Offset+Y*Size.Y.Scale);
+                elseif (Index == "ZIndex") then
+                    Update_Draw_Order()
+                end
+            end)
+
             if Type == "TextBox" then 
                 l__Attr.Text = "Textbox";
+                l__Attr.TextScaled = true; -- need to add behavior for false
                 l__Attr.TextColor3 = Color3.new(0,0,0);
                 l__Attr.FontSize = 14;
+            elseif Type == "Button" then 
+                l__Ev.Button1Down = createConnection();
+                l__Ev.Button2Down = createConnection();
+                l__Ev.Button1Up = createConnection();
+                l__Ev.Button2Up = createConnection();
             end
         end 
 
@@ -154,6 +206,7 @@ local Instance = {
                 else 
                     return Instances[ID].__index[Index];
                 end
+                return nil;
             end,
             __newindex = function(self,Index,Value)
                 if Index == "Parent" then 
@@ -168,7 +221,7 @@ local Instance = {
                         Value.__Children[self.ProxyID] = self;
                         Value.__Events.ChildAdded:Fire(Instances[self.ID]);
                     else
-                        error("Parent must be an instance", debug.traceback())
+                        error("Parent must be an instance");
                     end
                 elseif Index == "__Children" then 
                     if Value.ClassName then 
@@ -178,7 +231,7 @@ local Instance = {
                     l__Attr[Index] = Value;
                     self.Changed:Fire(Index);
                 elseif Instances[self.ID].__Events[Index] then
-                    error("Cannot set value of event",debug.traceback());
+                    error("Cannot set value of event");
                 end
                 rawset(self,Index,nil);
             end,

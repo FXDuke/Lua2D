@@ -19,6 +19,10 @@ local Enumerate = {
         Sibling = 0,
         Global = 1,
     },
+    ScaleType = {
+        Global = 0,
+        Sibling = 1
+    };
 };
 
 return Enumerate;

@@ -1,4 +1,55 @@
 NOTES FOR THIS UPDATE
 
-Fixed operation methods for all types,
-Fixed TweenService waiting before adding value (resulting in last value in dictionary being 1 step from completion)
+ADDED:
+
+game        Instance (Folder),  (In the future will be used as a hub for all services)
+workspace   Instance (Folder),  (Anything that is a child or descendant of this will be in the world)
+UI_Service  Instance (UI),      (Anything that is a child or descendant of this will be drawn)
+
+LOVE2D CONFIG FILE (See conf)
+
+UI Class:
+
+- ZIndex:     Number
+- ScaleType:  Enumerate.ScaleType (Enumeration for Sibling and Global relative size/position scaling)
+- MouseEnter: Event
+- MouseLeave: Event
+- Button Type {
+    - Button1Down:   Event 
+    - Button1Up:     Event
+    - Button2Down:   Event
+    - Button2Up:     Event
+}
+
+Mouse: (See Modules/mouse)
+
+- Hit:              Instance,   The instance the mouse is over
+- ScrollPosition:   Number,     The position of the scroll wheel, (0 min, 15 max)
+- WorldPosition:    Vector2,    The position of the mouse in the workspace environment,
+- Position:         Vector2,    The position of the mouse on the screen,
+
+Events
+
+- Button1Pressed:    Event
+- Button2Pressed:    Event
+- Button1Up:         Event
+- Button2Up:         Event
+- Button1Down:       Event
+- Button2Down:       Event
+- ScrollForward:     Event
+- ScrollBackward:    Event
+- Moved:             Event
+   
+
+CHANGED:
+
+UI Class:
+
+- Auto Scales after Window is resized
+
+
+FIXES:
+
+Types:
+
+- Minor bugs with some __mul and __div methods

@@ -1,6 +1,7 @@
 local class__tween = {};
 class__tween.__index = class__tween;
 
+
 function class__tween:Play()
     self.PlaybackState = Enumerate.PlaybackState.Playing;
     self.Thread:Play();
@@ -50,6 +51,7 @@ local EasingInfo = {
     },
 };
 
+local ActiveTweens = {};
 
 local Tween = {
     GetAlpha = function(Alpha,EasingStyle,EasingDirection)
@@ -76,6 +78,10 @@ function Tween:Create(Object,TweenInfo,PropertyTable)
     end
     l__tweenObject = setmetatable({
         Thread = thread(function(Thread)
+            if ActiveTweens[Object.ID] then 
+                ActiveTweens[Object.ID]:Close();
+            end
+            ActiveTweens[Object.ID] = l__tweenObject;
             while TweenInfo.RepeatCount > 0 do 
                 Thread:Wait(TweenInfo.Delay);
                 local Alpha = 0;
@@ -89,7 +95,7 @@ function Tween:Create(Object,TweenInfo,PropertyTable)
                 end
                 TweenInfo.RepeatCount = TweenInfo.RepeatCount - 1;
             end 
-            l__tweenObject.Completed:Fire();
+            ActiveTweens[Object.ID] = nil;
             l__tweenObject:Close();
         end),
         PlaybackState = Enumerate.PlaybackState.Normal,

@@ -95,14 +95,14 @@ local udim2__behavior = {
         if type(Factor) == "number" then 
             return Types.UDim2.new(self.X.Scale*Factor,self.X.Offset*Factor,self.Y.Scale*Factor,self.Y.Offset*Factor);
         else
-            error("Attempted to mul " .. type(Object) .. " with UDim2");
+            error("Attempted to mul " .. type(Factor) .. " with UDim2");
         end
     end,
     __div = function(self, Factor)
         if type(Factor) == "number" then 
             return Types.UDim2.new(self.X.Scale/Factor,self.X.Offset/Factor,self.Y.Scale/Factor,self.Y.Offset/Factor);
         else
-            error("Attempted to div " .. type(Object) .. " with UDim2");
+            error("Attempted to div " .. type(Factor) .. " with UDim2");
         end
     end,
     __tostring = function(UDim2)
@@ -124,6 +124,20 @@ local color3__behavior = {
             return Types.Color3.new(self.Red-Object.Red,self.Green-Object.Green,self.Blue-Object.Blue);
         else
             error("Attempted to sub " .. type(Object) .. " from Color3");
+        end
+    end,
+    __mul = function(self, Factor)
+        if type(Factor) == "number" then 
+            return Types.Color3.new(self.Red*Factor,self.Green*Factor,self.Blue*Factor);
+        else
+            error("Attempted to mul " .. type(Factor) .. " with Color3");
+        end
+    end,
+    __div = function(self, Factor)
+        if type(Factor) == "number" then 
+            return Types.Color3.new(self.Red/Factor,self.Green/Factor,self.Blue/Factor);
+        else
+            error("Attempted to div " .. type(Factor) .. " with UDim2");
         end
     end,
     __tostring = function(self)
