@@ -35,13 +35,13 @@ function class__Connection:Connect(Func)
 end
 
 function class__Connection:Once(Func)
-	local l__evnt = self:Connect(Func);
+	local evnt = self:Connect(Func);
 	thread(function(Thread)
 		self:Wait(Thread);
-		l__evnt:Disconnect();
+		evnt:Disconnect();
 		thread:Close();
 	end):Play();
-	return l__evnt;
+	return evnt;
 end
 
 function class__Connection:Wait(Thread)

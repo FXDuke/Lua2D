@@ -79,7 +79,7 @@ UI_Drawing = require("Modules/ui_drawing");
 
 Mouse = require("Modules/mouse");
 -- Mouse provides events for mouse behavior, as well as numerical values for mouse attributes
-local l__MouseHeld = {
+local MouseHeld = {
     [1] = {};
     [2] = {};
 };
@@ -89,10 +89,10 @@ love.graphics.setBackgroundColor(1,1,1);
 function love.draw()
     for _,ZIndex in pairs(Instance.getDrawOrder()) do 
         -- Draw Order is a table updated every time an instance under the UI Class's ZIndex changes
-        for _,l__Instance in ipairs(ZIndex) do 
-            if l__Instance.Class == "UI" then
-                if l__Instance.__Attributes.Visible then 
-                    UI_Drawing[l__Instance.Type](l__Instance);
+        for _,Instance in ipairs(ZIndex) do 
+            if Instance.Class == "UI" then
+                if Instance.__Attributes.Visible then 
+                    UI_Drawing[Instance.Type](Instance);
                 end
             end
         end
@@ -129,7 +129,7 @@ end
 function love.mousepressed(X,Y,Button)
     if Mouse.Hit.Type == "Button" and Mouse.Hit.Enabled then 
         Mouse.Hit["Button" .. Button .. "Down"]:Fire()
-        table.insert(l__MouseHeld[Button],Mouse.Hit);
+        table.insert(MouseHeld[Button],Mouse.Hit);
     end
     if Button == 1 then 
         Mouse.Button1Down:Fire();
@@ -141,12 +141,12 @@ function love.mousepressed(X,Y,Button)
 end
 
 function love.mousereleased(X,Y,Button)
-    for _,ButtonItem in pairs(l__MouseHeld[Button]) do 
+    for _,ButtonItem in pairs(MouseHeld[Button]) do 
         if ButtonItem["Button" .. Button .. "Up"] then 
             ButtonItem["Button" .. Button .. "Up"]:Fire()
         end
     end 
-    l__MouseHeld[Button] = {};
+    MouseHeld[Button] = {};
     if Button == 1 then 
         Mouse.Button1Up:Fire();
     elseif Button == 2 then 

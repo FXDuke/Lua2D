@@ -7,7 +7,7 @@ ADDED:
 
 MAIN: 
 
-- l__MouseHeld: Table, Keeps track of UI Instances that have had a mouse button pressed while they were focused,
+- Instance: Table, Keeps track of UI Instances that have had a mouse button pressed while they were focused,
 fires ButtonUp once it is released (fixed the problem of releasing on a different UI)
 
 INSTANCE:

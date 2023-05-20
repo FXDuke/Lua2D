@@ -46,7 +46,7 @@ Output.Size = UDim2.new(0.8,0,0.2,0);
 Output.Position = UDim2.new(0,0,0.8,0);
 Output.BackgroundColor3 = Color3.new(0.2,0.2,0.2);
 
-local function l__MAINTAIN_UI_FORMAT()
+local function MAINTAIN_UI_FORMAT()
 
     Explorer.Position = UDim2.new(Explorer.Position.X.Scale,0,Navigator.Size.Y.Scale,0);
     Explorer.Size = UDim2.new(Explorer.Size.X.Scale,0,Properties.Position.Y.Scale-Navigator.Size.Y.Scale,0);
@@ -81,7 +81,7 @@ local function ADD_DYNAMIC_STUDIO_UI(Object)
                 -- Size Constraint; UI_Service Object cannot be smaller than 0.1 Scale
                 Object.Position = Object.Position + UDim2.new(oX,0,oY,0);
                 Object.Size = Object.Size + UDim2.new(-oX,0,oY,0);
-                l__MAINTAIN_UI_FORMAT();
+                MAINTAIN_UI_FORMAT();
                 Old_Position = New_Position;
             until not Held;
             Object.ZIndex = Object.ZIndex - 1;

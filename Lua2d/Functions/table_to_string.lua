@@ -8,8 +8,8 @@ local function table_to_string(Table,Name)
 
     };
 
-    local function indent(l__Table,Indentation)
-        for _, Data in pairs(l__Table) do
+    local function indent(Table,Indentation)
+        for _, Data in pairs(Table) do
             if Type(Data) == "table" and not Printed[Data] then
                 Printed[Data] = true; 
                 if Data.Class then 

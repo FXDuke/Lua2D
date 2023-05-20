@@ -1,5 +1,5 @@
 local Instances = {};
-local l__INDEX = 0;
+local Instance__INDEX = 0;
 
 local DrawOrder = {};
 
@@ -25,11 +25,11 @@ function __DebugGetSelf(Object)
     return Instances[Object.ID];
 end
 
-local l__Instance = {};
-l__Instance.__index = l__Instance;
+local class__Instance = {};
+class__Instance.__index = class__Instance;
 
 
-function l__Instance:FindFirstChild(Name)
+function class__Instance:FindFirstChild(Name)
     for _,Child in pairs(self.__Children) do 
         if Child.Name == Name then 
             return Child;
@@ -38,7 +38,7 @@ function l__Instance:FindFirstChild(Name)
     return nil;
 end
 
-function l__Instance:WaitForChild(Name)
+function class__Instance:WaitForChild(Name)
     local Child = self:FindFirstChild(Name);
     if (Child == nil) then 
         local Yield_Limit = os.clock()+10;
@@ -57,7 +57,7 @@ function l__Instance:WaitForChild(Name)
     end
 end
 
-function l__Instance:FindFirstAncestor(Name)
+function class__Instance:FindFirstAncestor(Name)
     if self.Parent then 
         if self.Parent.Name == Name then
             return self.Parent;
@@ -69,11 +69,11 @@ function l__Instance:FindFirstAncestor(Name)
     end
 end
 
-function l__Instance:GetChildren()
+function class__Instance:GetChildren()
     return self.__Children;
 end
 
-function l__Instance:GetDescendants()
+function class__Instance:GetDescendants()
     local Descendants = {};
 
     local function Loop_Children(Object)
@@ -87,7 +87,7 @@ function l__Instance:GetDescendants()
     return Descendants;
 end
 
-function l__Instance:Destroy()
+function class__Instance:Destroy()
     self.Destroying:Fire();
     for _,Child in pairs(self.__Children) do 
         Child:Destroy();
@@ -116,14 +116,14 @@ local Instance = {
     end,
     new = function(Type)
 
-        l__INDEX = l__INDEX + 1;
+        Instance__INDEX = Instance__INDEX + 1;
 
         -- Applying Root Class
 
         Type = Type or "Folder";
         local Branch = Trees[Type];
 
-        local ID = l__INDEX;
+        local ID = Instance__INDEX;
         Instances[ID] = setmetatable({
             Type = Type,
             Class = Branch,
@@ -137,61 +137,61 @@ local Instance = {
                 Destroying = createConnection(),
                 Changed = createConnection(),
             },
-        },l__Instance);
+        },class__Instance);
         Instances[ID].__index = Instances[ID];
 
         -- Applying Class
 
-        local l__Attr = Instances[ID].__Attributes;
-        local l__Ev = Instances[ID].__Events;
-        local l__Ch = Instances[ID].__Children;
-        l__Attr.Class = Branch;
-        l__Attr.Name = Type;
+        local object__Attr = Instances[ID].__Attributes;
+        local object__Evnt = Instances[ID].__Events;
+        local object__Chil = Instances[ID].__Children;
+        object__Attr.Class = Branch;
+        object__Attr.Name = Type;
 
         if Branch == "WorldObject" then 
 
             -- Attributes 
 
-            l__Attr.Position = Vector2.new(0,0);
-            l__Attr.Size = Vector2.new(50,20);
-            l__Attr.Color3 = Color3.new(255,255,255);
-            l__Attr.Opacity = 1;
+            object__Attr.Position = Vector2.new(0,0);
+            object__Attr.Size = Vector2.new(50,20);
+            object__Attr.Color3 = Color3.new(255,255,255);
+            object__Attr.Opacity = 1;
 
         elseif Branch == "UI" then
 
             -- Attributes
 
-            l__Attr.Position = UDim2.new(0,0,0,0); 
-            l__Attr.Size = UDim2.new(0,50,0,50);
-            l__Attr.AbsolutePosition = Vector2.new(0,0);
-            l__Attr.AbsoluteSize = Vector2.new(50,50); 
-            l__Attr.ZIndexBehavior = Enumerate.ZIndexBehavior.Sibling;
-            l__Attr.Enabled = true;
-            l__Attr.Visible = true;
-            l__Attr.BackgroundColor3 = Color3.new(255,255,255);
-            l__Attr.BackgroundOpacity = 1;
-            l__Attr.ZIndex = 1;
-            l__Attr.ScaleType = Enumerate.ScaleType.Sibling;
+            object__Attr.Position = UDim2.new(0,0,0,0); 
+            object__Attr.Size = UDim2.new(0,50,0,50);
+            object__Attr.AbsolutePosition = Vector2.new(0,0);
+            object__Attr.AbsoluteSize = Vector2.new(50,50); 
+            object__Attr.ZIndexBehavior = Enumerate.ZIndexBehavior.Sibling;
+            object__Attr.Enabled = true;
+            object__Attr.Visible = true;
+            object__Attr.BackgroundColor3 = Color3.new(255,255,255);
+            object__Attr.BackgroundOpacity = 1;
+            object__Attr.ZIndex = 1;
+            object__Attr.ScaleType = Enumerate.ScaleType.Sibling;
 
             -- Events
 
-            l__Ev.MouseEnter = createConnection();
-            l__Ev.MouseLeave = createConnection();
-            l__Ev.Changed:Connect(function(self, Index)
-                if (Index == "Position") and l__Attr.Parent then
-                    local Position = l__Attr.Position;
-                    local X = (l__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH*Position.X.Scale or l__Attr.Parent.AbsolutePosition.X+l__Attr.Parent.AbsoluteSize.X*Position.X.Scale;
-                    local Y = (l__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT*Position.Y.Scale or l__Attr.Parent.AbsolutePosition.Y+l__Attr.Parent.AbsoluteSize.Y*Position.Y.Scale;
-                    l__Attr.AbsolutePosition = Vector2.new(Position.X.Offset+X, Position.Y.Offset+Y);
-                    for _,Child in pairs(l__Ch) do 
+         object__Evnt.MouseEnter = createConnection();
+         object__Evnt.MouseLeave = createConnection();
+         object__Evnt.Changed:Connect(function(self, Index)
+                if (Index == "Position") and object__Attr.Parent then
+                    local Position = object__Attr.Position;
+                    local X = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH*Position.X.Scale or object__Attr.Parent.AbsolutePosition.X+object__Attr.Parent.AbsoluteSize.X*Position.X.Scale;
+                    local Y = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT*Position.Y.Scale or object__Attr.Parent.AbsolutePosition.Y+object__Attr.Parent.AbsoluteSize.Y*Position.Y.Scale;
+                    object__Attr.AbsolutePosition = Vector2.new(Position.X.Offset+X, Position.Y.Offset+Y);
+                    for _,Child in pairs(object__Chil) do 
                         Child.Changed:Fire("Position");
                     end
-                elseif (Index == "Size") and l__Attr.Parent then 
-                    local Size = l__Attr.Size;
-                    local X = (l__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH or l__Attr.Parent.AbsoluteSize.X;
-                    local Y = (l__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT or l__Attr.Parent.AbsoluteSize.Y;
-                    l__Attr.AbsoluteSize = Vector2.new(Size.X.Offset+X*Size.X.Scale,Size.Y.Offset+Y*Size.Y.Scale);
-                    for _,Child in pairs(l__Ch) do 
+                elseif (Index == "Size") and object__Attr.Parent then 
+                    local Size = object__Attr.Size;
+                    local X = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH or object__Attr.Parent.AbsoluteSize.X;
+                    local Y = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT or object__Attr.Parent.AbsoluteSize.Y;
+                    object__Attr.AbsoluteSize = Vector2.new(Size.X.Offset+X*Size.X.Scale,Size.Y.Offset+Y*Size.Y.Scale);
+                    for _,Child in pairs(object__Chil) do 
                         Child.Changed:Fire("Size");
                     end
                 elseif (Index == "ZIndex") then
@@ -202,16 +202,16 @@ local Instance = {
             -- Branch Attributes / Events 
 
             if Type == "TextBox" then 
-                l__Attr.Text = "Textbox";
-                l__Attr.TextOpacity = 1;
-                l__Attr.TextScaled = true; -- need to add behavior for false
-                l__Attr.TextColor3 = Color3.new(0,0,0);
-                l__Attr.FontSize = 14; -- Need to add font size to ui_drawing
+                object__Attr.Text = "Textbox";
+                object__Attr.TextOpacity = 1;
+                object__Attr.TextScaled = true; -- need to add behavior for false
+                object__Attr.TextColor3 = Color3.new(0,0,0);
+                object__Attr.FontSize = 14; -- Need to add font size to ui_drawing
             elseif Type == "Button" then 
-                l__Ev.Button1Down = createConnection();
-                l__Ev.Button2Down = createConnection();
-                l__Ev.Button1Up = createConnection();
-                l__Ev.Button2Up = createConnection();
+             object__Evnt.Button1Down = createConnection();
+             object__Evnt.Button2Down = createConnection();
+             object__Evnt.Button1Up = createConnection();
+             object__Evnt.Button2Up = createConnection();
             end
 
         end 
@@ -223,10 +223,10 @@ local Instance = {
         },{
             __index = function(self,Index)
                 if Instances[ID] then
-                    if l__Attr[Index] then -- returns the attribute with the index passed
-                        return l__Attr[Index];
-                    elseif l__Ev[Index] then -- returns the event with the index passed
-                        return l__Ev[Index];
+                    if object__Attr[Index] then -- returns the attribute with the index passed
+                        return object__Attr[Index];
+                    elseif object__Evnt[Index] then -- returns the event with the index passed
+                        return object__Evnt[Index];
                     elseif Instances[ID]:FindFirstChild(Index) then -- returns the child with the index passed (if a child is found)
                         return Instances[ID]:FindFirstChild(Index);
                     else
@@ -238,20 +238,20 @@ local Instance = {
             end,
             __newindex = function(self,Index,Value)
                 if Index == "Parent" then 
-                    if l__Attr.Parent then 
-                        local l__proxy = setmetatable({ID=self.ID,ProxyID=self.ProxyID},self);
+                    if object__Attr.Parent then 
+                        local Proxy = setmetatable({ID=self.ID,ProxyID=self.ProxyID},self);
                         -- Creates a clone of the proxy so the current one's memory can be cleared
                         Instances[self.ID].ChildRemoved:Fire(Instances[self.ID]);
-                        rawset(l__Attr.Parent.__Children,self.ProxyID,nil);
+                        rawset(object__Attr.Parent.__Children,self.ProxyID,nil);
                         -- Rawset allocates the memory directly
-                        self = l__proxy;
+                        self = Proxy;
                     end
                     if Value.Class then 
-                        l__Attr.Parent = Value;
+                        object__Attr.Parent = Value;
                         Value.__Children[self.ProxyID] = self;
                         Value.__Events.ChildAdded:Fire(Instances[self.ID]);
-                        l__Ev.Changed:Fire("Position");
-                        l__Ev.Changed:Fire("Size");
+                     object__Evnt.Changed:Fire("Position");
+                     object__Evnt.Changed:Fire("Size");
                         -- Updates the Object's Size and Position to become relative to the new parent
                     else
                         error("Parent must be an instance");
@@ -262,11 +262,11 @@ local Instance = {
                     else
                         error("Unable to add " .. type(Value) .. " to children")
                     end
-                elseif l__Attr[Index] then 
+                elseif object__Attr[Index] then 
                     -- If the attribute exists, it changes the value.
                     -- This prevents new values from being added to the main object 
                     -- but allows already present values to be changed.
-                    l__Attr[Index] = Value;
+                    object__Attr[Index] = Value;
                     self.Changed:Fire(Index);
                 elseif Instances[self.ID].__Events[Index] then
                     error("Cannot set value of event");

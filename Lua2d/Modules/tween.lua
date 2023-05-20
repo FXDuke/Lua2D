@@ -80,12 +80,12 @@ function Tween:Create(Object,TweenInfo,PropertyTable)
             break;
         end
     end
-    local l__tweenObject = setmetatable({
+    local tweenObject = setmetatable({
         Thread = thread(function(Thread)
             if ActiveTweens[Object.ID] then 
                 ActiveTweens[Object.ID]:Close(); -- Closes the active tween so there is no con
             end
-            ActiveTweens[Object.ID] = l__tweenObject;
+            ActiveTweens[Object.ID] = tweenObject;
             while TweenInfo.RepeatCount > 0 do 
                 Thread:Wait(TweenInfo.Delay);
                 local Alpha = 0;
@@ -100,12 +100,12 @@ function Tween:Create(Object,TweenInfo,PropertyTable)
                 TweenInfo.RepeatCount = TweenInfo.RepeatCount - 1;
             end 
             ActiveTweens[Object.ID] = nil;
-            l__tweenObject:Close();
+            tweenObject:Close();
         end),
         PlaybackState = Enumerate.PlaybackState.Normal,
         Completed = createConnection(),
     },class__tween);
-    return l__tweenObject;
+    return tweenObject;
 end
 
 return Tween;
