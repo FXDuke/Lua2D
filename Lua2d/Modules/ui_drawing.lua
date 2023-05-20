@@ -20,7 +20,7 @@ local UI_Drawing = {
     ["TextBox"] = function(TextBox)
         local Position, Size, Color = DrawUI(TextBox);
         local TextColor = TextBox.__Attributes.TextColor3;
-        love.graphics.setColor(TextColor.Red,TextColor.Green,TextColor.Blue);
+        love.graphics.setColor(TextColor.Red,TextColor.Green,TextColor.Blue, TextBox.__Attributes.TextOpacity);
         love.graphics.printf(
             TextBox.__Attributes.Text,
             Position.X,

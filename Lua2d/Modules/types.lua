@@ -19,14 +19,14 @@ local vector2__behavior = {
         if type(Magnitude) == "number" then 
             return Types.Vector2.new(self.X * Magnitude,self.Y * Magnitude);
         else 
-            error("Attempted to mul " .. type(Object) .. " with Vector2");
+            error("Attempted to mul " .. type(Magnitude) .. " with Vector2");
         end
     end,
     __div = function(self,Magnitude)
         if type(Magnitude) == "number" then 
             return Types.Vector2.new(self.X / Magnitude,self.Y / Magnitude);
         else 
-            error("Attempted to div " .. type(Object) .. " with Vector2");
+            error("Attempted to div " .. type(Magnitude) .. " with Vector2");
         end
     end,
     __eq = function(self, Object)
@@ -147,7 +147,7 @@ local color3__behavior = {
 color3__behavior.__index = color3__behavior;
 
 Types = {
-    Vector2 = {
+    Vector2 = { -- Type used for position and size, can be used in operations with UDim2
         new = function(X,Y)
             local Magnitude = math.sqrt(X*X+Y*Y);
             return setmetatable({
@@ -162,7 +162,7 @@ Types = {
             },vector2__behavior);
         end,
     },
-    Color3 = {
+    Color3 = { -- Type used for coloring an instance
         new = function(Red,Green,Blue)
             return setmetatable({
                 Type = "Color3",
@@ -172,7 +172,7 @@ Types = {
             },color3__behavior);
         end,
     },
-    UDim = {
+    UDim = { -- Type for Singular UI Dimension 
         new = function(Scale,Offset)
             return setmetatable({
                 Type = "UDim",
@@ -181,7 +181,7 @@ Types = {
             },udim__behavior);
         end,
     },
-    UDim2 = {
+    UDim2 = { -- Type for Two UI Dimensions (X,Y)
         new = function(xScale,xOffset,yScale,yOffset)
             return setmetatable({
                 Type = "UDim2",

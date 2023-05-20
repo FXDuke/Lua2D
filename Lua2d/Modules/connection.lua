@@ -4,6 +4,7 @@ instance__Connection.__index = instance__Connection;
 
 function instance__Connection:Disconnect()
 	table.remove(self.__Connector.__Connections,self.ID);
+	self = nil;
 end
 
 function instance__Connection:Pause()
@@ -31,6 +32,16 @@ function class__Connection:Connect(Func)
 			error("Connections are read only. Use :Play(),:Pause(), or :Disconnect()");
 		end,
 	});
+end
+
+function class__Connection:Once(Func)
+	local l__evnt = self:Connect(Func);
+	thread(function(Thread)
+		self:Wait(Thread);
+		l__evnt:Disconnect();
+		thread:Close();
+	end):Play();
+	return l__evnt;
 end
 
 function class__Connection:Wait(Thread)

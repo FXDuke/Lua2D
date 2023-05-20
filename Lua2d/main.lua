@@ -1,4 +1,3 @@
-
 WINDOW_WIDTH = love.graphics.getWidth();
 WINDOW_HEIGHT = love.graphics.getHeight();
 
@@ -60,21 +59,30 @@ workspace.Name = "workspace"
 workspace.Parent = game;
 ui_service = Instance.new("UI");
 -- ui_service is a UI Instance that acts as a folder and hold the objects that will be drawn 
-ui_service.Parent = game;
-ui_service.Name = "ui_service"
 ui_service.ScaleType = Enumerate.ScaleType.Global;
+ui_service.Parent = game;
+ui_service.BackgroundOpacity = 0;
+ui_service.Name = "ui_service"
 ui_service.ZIndex = 0;
 ui_service.Size = UDim2.new(1,0,1,0);
 ui_service.Position = UDim2.new(0,0,0,0);
 
 STUDIO_UI = require("Modules/studio_ui");
--- The framework for what will be the UI for explorer and editor the workspace and ui worlds
+-- The framework for what will be the UI for explorer and editor the workspace and ui worlds (Values should be locked and only changed by events / methods)
+-- Automatically maintains UI Format for standard UI
+workplace_ui = STUDIO_UI.ui_workspace;
+-- workplace_ui will manage what is drawn in the workspace / game 
 
 UI_Drawing = require("Modules/ui_drawing");
 -- Provides functions to draw types of instances under the UI Class
 
 Mouse = require("Modules/mouse");
 -- Mouse provides events for mouse behavior, as well as numerical values for mouse attributes
+local l__MouseHeld = {
+    [1] = {};
+    [2] = {};
+};
+-- Table for instances with a mouse button event fired to ensure they are released when the button is;
 
 love.graphics.setBackgroundColor(1,1,1);
 function love.draw()
@@ -82,7 +90,7 @@ function love.draw()
         -- Draw Order is a table updated every time an instance under the UI Class's ZIndex changes
         for _,l__Instance in ipairs(ZIndex) do 
             if l__Instance.Class == "UI" then
-                if l__Instance.__Attributes.Enabled and l__Instance.__Attributes.Visible then 
+                if l__Instance.__Attributes.Visible then 
                     UI_Drawing[l__Instance.Type](l__Instance);
                 end
             end
@@ -92,13 +100,13 @@ end
 
 function love.mousemoved(X,Y)
     Mouse.Position = Vector2.new(X,Y);
-    for _,UIObject in pairs(ui_service:GetChildren()) do 
+    for _,UIObject in pairs(ui_service:GetDescendants()) do 
         if UIObject.Visible and UIObject.Enabled then
             local Position = UIObject.AbsolutePosition;
             local Size = UIObject.AbsoluteSize;
             local Boundary = (X >= Position.X and X <= Position.X+Size.X) and (Y >= Position.Y and Y <= Position.Y+Size.Y);
             -- Boundary is a boolean that checks if the mouse is inside of the UI 
-            if Boundary and Mouse.Hit ~= UIObject and UIObject.ZIndex >= Mouse.Hit.ZIndex then 
+            if Boundary and Mouse.Hit ~= UIObject and UIObject.ZIndex >= Mouse.Hit.ZIndex and Mouse.Hit.Enabled then 
                 Mouse.Hit.MouseLeave:Fire();
                 Mouse.Hit = UIObject;
                 UIObject.MouseEnter:Fire();
@@ -113,31 +121,27 @@ function love.mousemoved(X,Y)
 end
 
 function love.mousepressed(X,Y,Button)
+    if Mouse.Hit.Type == "Button" and Mouse.Hit.Enabled then 
+        Mouse.Hit["Button" .. Button .. "Down"]:Fire()
+        table.insert(l__MouseHeld[Button],Mouse.Hit);
+    end
     if Button == 1 then 
-        if Mouse.Hit.Type == "Button" then
-            Mouse.Hit.Button1Down:Fire();
-        end
         Mouse.Button1Down:Fire();
         Mouse.Button1Pressed:Fire();
     elseif Button == 2 then 
-        if Mouse.Hit.Type == "Button" then 
-            Mouse.Hit.Button2Down:Fire();
-        end
         Mouse.Button2Down:Fire();
         Mouse.Button2Pressed:Fire();
     end
 end
 
 function love.mousereleased(X,Y,Button)
+    for _,ButtonItem in pairs(l__MouseHeld[Button]) do 
+        ButtonItem["Button" .. Button .. "Up"]:Fire()
+    end 
+    l__MouseHeld[Button] = {};
     if Button == 1 then 
-        if Mouse.Hit.Type == "Button" then 
-            Mouse.Hit.Button1Up:Fire();
-        end
         Mouse.Button1Up:Fire();
     elseif Button == 2 then 
-        if Mouse.Hit.Type == "Button" then 
-            Mouse.Hit.Button2Up:Fire();
-        end
         Mouse.Button2Up:Fire();
     end
 end
@@ -160,6 +164,14 @@ function love.resize(Width, Height)
         UIObject.Changed:Fire("Position");
         UIObject.Changed:Fire("Size");
    end
+end
+
+function love.mousefocus(Focus)
+    if Focus then
+        Mouse.Hit.MouseEnter:Fire();
+    else
+        Mouse.Hit.MouseLeave:Fire();
+    end
 end
 
 function love.update(DeltaTime)
