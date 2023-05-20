@@ -16,8 +16,8 @@ end
 
 function class__tween:Close()
     self.PlaybackState = Enumerate.PlaybackState.Completed;
-    self.Completed:Fire();
     self.Thread:Close();
+    self.Completed:Fire();
     self = nil;
 end
 -- Completely Closes the Tween, Abruptly stopping the animation where it is at
@@ -80,7 +80,7 @@ function Tween:Create(Object,TweenInfo,PropertyTable)
             break;
         end
     end
-    l__tweenObject = setmetatable({
+    local l__tweenObject = setmetatable({
         Thread = thread(function(Thread)
             if ActiveTweens[Object.ID] then 
                 ActiveTweens[Object.ID]:Close(); -- Closes the active tween so there is no con

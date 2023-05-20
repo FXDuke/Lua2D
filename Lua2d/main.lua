@@ -60,9 +60,10 @@ workspace.Parent = game;
 ui_service = Instance.new("UI");
 -- ui_service is a UI Instance that acts as a folder and hold the objects that will be drawn 
 ui_service.ScaleType = Enumerate.ScaleType.Global;
+ui_service.Name = "UIService"
 ui_service.Parent = game;
 ui_service.BackgroundOpacity = 0;
-ui_service.Name = "ui_service"
+
 ui_service.ZIndex = 0;
 ui_service.Size = UDim2.new(1,0,1,0);
 ui_service.Position = UDim2.new(0,0,0,0);
@@ -70,7 +71,7 @@ ui_service.Position = UDim2.new(0,0,0,0);
 STUDIO_UI = require("Modules/studio_ui");
 -- The framework for what will be the UI for explorer and editor the workspace and ui worlds (Values should be locked and only changed by events / methods)
 -- Automatically maintains UI Format for standard UI
-workplace_ui = STUDIO_UI.ui_workspace;
+ui_workspace = STUDIO_UI.ui_workspace;
 -- workplace_ui will manage what is drawn in the workspace / game 
 
 UI_Drawing = require("Modules/ui_drawing");
@@ -101,7 +102,7 @@ end
 function love.mousemoved(X,Y)
     Mouse.Position = Vector2.new(X,Y);
     for _,UIObject in pairs(ui_service:GetDescendants()) do 
-        if UIObject.Visible and UIObject.Enabled then
+        if UIObject.Visible and UIObject.Enabled and Mouse.Hit then
             local Position = UIObject.AbsolutePosition;
             local Size = UIObject.AbsoluteSize;
             local Boundary = (X >= Position.X and X <= Position.X+Size.X) and (Y >= Position.Y and Y <= Position.Y+Size.Y);
@@ -114,6 +115,11 @@ function love.mousemoved(X,Y)
             elseif Mouse.Hit == UIObject and not Boundary then 
                 Mouse.Hit = ui_service;
                 UIObject.MouseLeave:Fire();
+            end
+        else
+            if not Mouse.Hit then 
+                Mouse.Hit = ui_service;
+                break;
             end
         end
     end
@@ -136,7 +142,9 @@ end
 
 function love.mousereleased(X,Y,Button)
     for _,ButtonItem in pairs(l__MouseHeld[Button]) do 
-        ButtonItem["Button" .. Button .. "Up"]:Fire()
+        if ButtonItem["Button" .. Button .. "Up"] then 
+            ButtonItem["Button" .. Button .. "Up"]:Fire()
+        end
     end 
     l__MouseHeld[Button] = {};
     if Button == 1 then 
@@ -167,13 +175,18 @@ function love.resize(Width, Height)
 end
 
 function love.mousefocus(Focus)
-    if Focus then
-        Mouse.Hit.MouseEnter:Fire();
-    else
-        Mouse.Hit.MouseLeave:Fire();
+    if Mouse.Hit then 
+        if Focus then
+            Mouse.Hit.MouseEnter:Fire();
+        else
+            Mouse.Hit.MouseLeave:Fire();
+        end
     end
 end
 
 function love.update(DeltaTime)
     task.Update();
 end
+
+-- Edit this script to test instead of filling up the main.lua file (in the future this will be what is executed in tests)
+local Executed__Script = require("editor");

@@ -16,7 +16,7 @@ local Properties = Layout.Properties;
 local Output = Layout.Output;
 
 ui_workspace.Parent = ui_service;
-ui_workspace.Name = "ui_workspace";
+ui_workspace.Name = "WorkspaceUI";
 ui_workspace.ZIndex = 0;
 ui_workspace.Size = UDim2.new(0.8,0,0.625,0);
 ui_workspace.Position = UDim2.new(0,0,0.175,0);

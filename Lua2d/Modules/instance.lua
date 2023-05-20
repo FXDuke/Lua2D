@@ -1,4 +1,6 @@
 local Instances = {};
+local l__INDEX = 0;
+
 local DrawOrder = {};
 
 local function Update_Draw_Order()
@@ -86,18 +88,21 @@ function l__Instance:GetDescendants()
 end
 
 function l__Instance:Destroy()
-    self = (self.ProxyID) and __DebugGetSelf(self) or self;
+    self.Destroying:Fire();
     for _,Child in pairs(self.__Children) do 
         Child:Destroy();
     end
-    self.__Events.Destroying:Fire();
     if self.Parent then 
-        self.Parent.__Events.ChildRemoved:Fire(self);
+        if self.Class == "UI" and Mouse.Hit == self then 
+            Mouse.Hit = ui_service;
+        end 
+        self.Parent.ChildRemoved:Fire(self);
         rawset(self.Parent.__Children,self.__Proxy.ProxyID,nil);
     end
-    rawset(Instances,self.ID,nil);
+    rawset(Instances, self.ID, nil);
+    self = nil;
+    Update_Draw_Order()
 end
-
 
 
 
@@ -111,12 +116,14 @@ local Instance = {
     end,
     new = function(Type)
 
+        l__INDEX = l__INDEX + 1;
+
         -- Applying Root Class
 
         Type = Type or "Folder";
         local Branch = Trees[Type];
 
-        local ID = #Instances+1;
+        local ID = l__INDEX;
         Instances[ID] = setmetatable({
             Type = Type,
             Class = Branch,
@@ -215,16 +222,19 @@ local Instance = {
             ProxyID = tostring(Instances[ID]);
         },{
             __index = function(self,Index)
-                if l__Attr[Index] then -- returns the attribute with the index passed
-                    return l__Attr[Index];
-                elseif Instances[ID].__Events[Index] then -- returns the event with the index passed
-                    return Instances[ID].__Events[Index];
-                elseif Instances[ID]:FindFirstChild(Index) then -- returns the child with the index passed (if a child is found)
-                    return Instances[ID]:FindFirstChild(Index);
-                else 
-                    return Instances[ID].__index[Index];
-                end
-                return nil;
+                if Instances[ID] then
+                    if l__Attr[Index] then -- returns the attribute with the index passed
+                        return l__Attr[Index];
+                    elseif l__Ev[Index] then -- returns the event with the index passed
+                        return l__Ev[Index];
+                    elseif Instances[ID]:FindFirstChild(Index) then -- returns the child with the index passed (if a child is found)
+                        return Instances[ID]:FindFirstChild(Index);
+                    else
+                        return Instances[ID].__index[Index];
+                    end
+                else
+                    return nil;
+                end 
             end,
             __newindex = function(self,Index,Value)
                 if Index == "Parent" then 
