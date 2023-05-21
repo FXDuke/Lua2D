@@ -1,45 +1,28 @@
 NOTES FOR THIS UPDATE
 
 ADDED:
-   
-* General Notes
-* More Readability
-
-MAIN: 
-
-- Instance: Table, Keeps track of UI Instances that have had a mouse button pressed while they were focused,
-fires ButtonUp once it is released (fixed the problem of releasing on a different UI)
 
 INSTANCE:
 
-* TextOpacity: number (TextBox Instance)   Seperates TextOpacity from BackgroundOpacity
-- UI Class now updates Instance's Children's Size and Position when updated respectively
+*** Clone:                      Method, Returns a clone of the instance
 
-Connections:
+- FindFirstChildOfType:         Method, Finds first child of specified type
+- FindFirstDescendantOfType:    Method, Finds first descendant of specified type
+- FindFirstAncestorOfType:      Method, Finds first ancestor of specified type
 
-* Once:             Method (Fires a binded function once then unbinds the function and clears the memory);
+- TextButton:    Instance        Type,   Acts as a button, and a text label
+- ScrollingBox:  Instance        Type,   Allows the user to scroll through a container
 
-STUDIO_UI:
+- ClipsChildren: Instance(UI)    boolean, Determines if children of the object are clipped when exceeding parent's bounds
 
-* workplace_ui:     Instance (UI),  Manages what is drawn inside the Workplace (game) and scales it to fit.
-Size updates dynamically with studio_ui sizes.
+STUDIO__UI:
 
-- All Button Types that are in or added to STUDIO_UI change in size with mouse (and automatically reformats the UI);
-Not optimized + Not flexibile (Temporary and will change in the future)
+- Made name labels text buttons an
+- ScrollingBox's for Explorer and Properties
 
 CHANGED:
 
-INSTANCE:
-
-* Proxy table no longer takes memory to hold ID, Class, and Name and instead index's the main Object
-- Enabled being disabled now does not prevent the object from being drawn, but prevents input events from being fired.
-
-
-STUDIO_UI:
-
-- All Objects changed to Button types
 
 FIXES:
 
-- MouseLeave is now fired when the mouse leaves the window 
-- MouseEnter is now fired when the mouse enters the window
+- Many Bugs with Destroy method

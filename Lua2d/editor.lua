@@ -28,6 +28,7 @@ local ButtonText = Instance.new("TextBox");
 ButtonText.Parent = WorkspaceUI.GunButton; -- You could just do Button but this is for the example.
 ButtonText.Enabled = false; -- Disables events like MouseEnter
 ButtonText.BackgroundOpacity = 0;
+ButtonText.Name = "Label";
 ButtonText.Text = "Shoot!";
 ButtonText.Size = UDim2.new(1,0,1,0);
 ButtonText.ZIndex = 3;
@@ -37,12 +38,42 @@ ButtonText.ZIndex = 3;
 
 Button.MouseEnter:Connect(function()
     Tween:Create(Button,TweenInfo.new(0.125,Enumerate.EasingStyle.Sine),{BackgroundColor3=Color3.new(0.5,0.5,0.5),BackgroundOpacity=1}):Play();
-    Tween:Create(ButtonText,TweenInfo.new(0.125,Enumerate.EasingStyle.Sine),{TextColor3=Color3.new(0.8,0.8,0.8)}):Play();
+    Tween:Create(Button.Label,TweenInfo.new(0.125,Enumerate.EasingStyle.Sine),{TextColor3=Color3.new(0.8,0.8,0.8)}):Play();
 end)
 
 Button.MouseLeave:Connect(function()
     Tween:Create(Button,TweenInfo.new(0.125,Enumerate.EasingStyle.Sine),{BackgroundColor3=Origin_Color,BackgroundOpacity=Origin_Opacity}):Play();
-    Tween:Create(ButtonText,TweenInfo.new(0.125,Enumerate.EasingStyle.Sine),{TextColor3=Color3.new(0,0,0)}):Play();
+    Tween:Create(Button.Label,TweenInfo.new(0.125,Enumerate.EasingStyle.Sine),{TextColor3=Color3.new(0,0,0)}):Play();
+end)
+
+local Button2 = Button:Clone();
+Button2.Parent = WorkspaceUI;
+Button2.Name = "AddToUi";
+Button2.Position = UDim2.new(0,25,0.5,50);
+Button2.Label.Text = "Add Object";
+
+Button2.MouseEnter:Connect(function()
+    Tween:Create(Button2,TweenInfo.new(0.125,Enumerate.EasingStyle.Sine),{BackgroundColor3=Color3.new(0.5,0.5,0.5),BackgroundOpacity=1}):Play();
+    Tween:Create(Button2.Label,TweenInfo.new(0.125,Enumerate.EasingStyle.Sine),{TextColor3=Color3.new(0.8,0.8,0.8)}):Play();
+end)
+
+Button2.MouseLeave:Connect(function()
+    Tween:Create(Button2,TweenInfo.new(0.125,Enumerate.EasingStyle.Sine),{BackgroundColor3=Origin_Color,BackgroundOpacity=Origin_Opacity}):Play();
+    Tween:Create(Button2.Label,TweenInfo.new(0.125,Enumerate.EasingStyle.Sine),{TextColor3=Color3.new(0,0,0)}):Play();
+end)
+
+local index = 0;
+
+Button2.Button1Down:Connect(function()
+    local text = Instance.new("TextBox");
+    text.Parent = game.UIService.Explorer.Content;
+    text.ZIndex = 5;
+    text.Size = UDim2.new(1,0,0,50);
+    text.BackgroundOpacity = 0.5;
+    text.Position = UDim2.new(0,0,0,index*55)
+    text.Text = "TextBox_" .. index;
+    game.UIService.Explorer.Content.CanvasSize = game.UIService.Explorer.Content.CanvasSize + Vector2.new(0,55);
+    index = index + 1;
 end)
 
 Button.Button1Down:Connect(function()

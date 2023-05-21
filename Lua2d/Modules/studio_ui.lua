@@ -3,9 +3,9 @@
 
 local Layout = {
     Navigator = Instance.new("UI"),
-    Explorer = Instance.new("Button"),
-    Properties = Instance.new("Button"),
-    Output = Instance.new("Button"),
+    Explorer = Instance.new("UI"),
+    Properties = Instance.new("UI"),
+    Output = Instance.new("UI"),
     ui_workspace = Instance.new("UI");
 };
 
@@ -16,6 +16,7 @@ local Properties = Layout.Properties;
 local Output = Layout.Output;
 
 ui_workspace.Parent = ui_service;
+ui_workspace.ClipsChildren = true;
 ui_workspace.Name = "WorkspaceUI";
 ui_workspace.ZIndex = 0;
 ui_workspace.Size = UDim2.new(0.8,0,0.625,0);
@@ -33,12 +34,28 @@ Explorer.ZIndex = 0;
 Explorer.Size = UDim2.new(0.2,0,0.525,0);
 Explorer.Position = UDim2.new(0.8,0,0.175,0);
 Explorer.BackgroundColor3 = Color3.new(0.4,0.4,0.4);
+local Explorer__Content = Instance.new("ScrollingBox");
+Explorer__Content.Parent = Explorer;
+Explorer__Content.Name = "Content";
+Explorer__Content.Size = UDim2.new(1,0,1,-30);
+Explorer__Content.Position = UDim2.new(0,0,0,30);
+Explorer__Content.CanvasSize = UDim2.new(1,0,0,0);
+Explorer__Content.BackgroundOpacity = 0;
+Explorer__Content.ZIndex = 2;
 Properties.Parent = ui_service;
 Properties.Name = "Properties";
 Properties.ZIndex = 0;
 Properties.Size = UDim2.new(0.2,0,0.4,0);
 Properties.Position = UDim2.new(0.8,0,0.7,0);
 Properties.BackgroundColor3 = Color3.new(0.3,0.3,0.3);
+local Properties__Content = Instance.new("ScrollingBox");
+Properties__Content.Parent = Properties;
+Properties__Content.Name = "Content";
+Properties__Content.Size = UDim2.new(1,0,1,-30);
+Properties__Content.Position = UDim2.new(0,0,0,30);
+Properties__Content.CanvasSize = UDim2.new(1,0,0,0);
+Properties__Content.BackgroundOpacity = 0;
+Properties__Content.ZIndex = 2;
 Output.Parent = ui_service;
 Output.Name = "Output";
 Output.ZIndex = 0;
@@ -62,8 +79,23 @@ local function MAINTAIN_UI_FORMAT()
 end
 
 local function ADD_DYNAMIC_STUDIO_UI(Object)
+    local Header = Instance.new("TextButton");
+    Header.Parent = Object;
+    Header.Name = "Header";
+    Header.Text = Object.Name;
+    Header.Enabled = true;
+    Header.BackgroundOpacity = 0.2;
+    Header.TextOpacity = 0.7;
+    Header.Size = UDim2.new(1,0,0,25);
+    Header.ZIndex = 1;
+    Header.MouseEnter:Connect(function()
+        Tween:Create(Header,TweenInfo.new(0.1,Enumerate.EasingStyle.Sine),{TextOpacity=1}):Play();
+    end)
+    Header.MouseLeave:Connect(function()
+        Tween:Create(Header,TweenInfo.new(0.1,Enumerate.EasingStyle.Sine),{TextOpacity=0.5}):Play();
+    end)
     local Held = false;
-    local Button1Press = Object.Button1Down:Connect(function()
+    local Button1Press = Object.Header.Button1Down:Connect(function()
         Held = true;
         local Old_Position = Mouse.Position;
         -- Temporary Color Change for Header to Show mouse has been pressed.
@@ -88,7 +120,7 @@ local function ADD_DYNAMIC_STUDIO_UI(Object)
             Thread:Close();
         end):Play()
     end)
-    local Button1Release = Object.Button1Up:Connect(function()
+    local Button1Release = Object.Header.Button1Up:Connect(function()
         -- Temporary Color Change for Header to Show mouse has been Released.
         Tween:Create(Object.Header,TweenInfo.new(0.1,Enumerate.EasingStyle.Sine),{TextColor3=Color3.new(0,0,0)}):Play();
         -- ^
@@ -101,38 +133,13 @@ local function ADD_DYNAMIC_STUDIO_UI(Object)
     end)
 end
 
-local function TEMP_ADD_OBJECT_HEADER(Object)
-    -- Temporary Tool to display the name of the object added to UI_SERVICE when the object is hovered over.
-    local Header = Instance.new("TextBox");
-    Header.Parent = Object;
-    Header.Name = "Header";
-    Header.Text = Object.Name;
-    Header.Enabled = false;
-    Header.BackgroundOpacity = 0;
-    Header.TextOpacity = 0;
-    Header.Size = UDim2.new(1,0,0,50);
-    Header.ZIndex = 1;
-    Object.MouseEnter:Connect(function()
-        Tween:Create(Header,TweenInfo.new(0.1,Enumerate.EasingStyle.Sine),{TextOpacity=1}):Play();
-    end)
-    Object.MouseLeave:Connect(function()
-        Tween:Create(Header,TweenInfo.new(0.1,Enumerate.EasingStyle.Sine),{TextOpacity=0}):Play();
-    end)
-end
 
 for _,Object in pairs(Layout) do
-    if type(Object) == "Button" then 
-        ADD_DYNAMIC_STUDIO_UI(Object);
-    end
-    TEMP_ADD_OBJECT_HEADER(Object);
+    ADD_DYNAMIC_STUDIO_UI(Object);  
 end
 
-
 ui_service.ChildAdded:Connect(function(self,Object)
-    if type(Object) == "Button" then 
-        ADD_DYNAMIC_STUDIO_UI(Object);
-    end
-    TEMP_ADD_OBJECT_HEADER(Object);
+    ADD_DYNAMIC_STUDIO_UI(Object);
     Instance.Update_Draw_Order();
 end);
 

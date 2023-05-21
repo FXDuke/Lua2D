@@ -12,6 +12,13 @@ local function Update_Draw_Order()
     end
 end
 
+local function Loop__Ancestory__Event(Object,Event,Value)
+    Object[Event]:Fire(Value);
+    if Object.Parent then 
+        Loop__Ancestory__Event(Object.Parent,Event,Value);
+    end
+end
+
 local Trees = {
     ["Part"] = "WorldObject",
     ["TextBox"] = "UI",
@@ -19,6 +26,8 @@ local Trees = {
     ["Object"] = "Object",
     ["Folder"] = "Object",
     ["Button"] = "UI",
+    ["ScrollingBox"] = "UI",
+    ["TextButton"] = "UI",
 };
 
 function __DebugGetSelf(Object)
@@ -97,6 +106,7 @@ function class__Instance:Destroy()
             Mouse.Hit = ui_service;
         end 
         self.Parent.ChildRemoved:Fire(self);
+        Loop__Ancestory__Event(self.Parent,"DescendantRemoved",self);
         rawset(self.Parent.__Children,self.__Proxy.ProxyID,nil);
     end
     rawset(Instances, self.ID, nil);
@@ -104,7 +114,56 @@ function class__Instance:Destroy()
     Update_Draw_Order()
 end
 
+function class__Instance:FindFirstChildOfType(Type)
+    for _,Object in pairs(self:GetChildren()) do 
+        if Object.Type == Type then 
+            return Object;
+        end 
+    end
+    return nil;
+end
 
+function class__Instance:FindFirstAncestorOfType(Type)
+    if self.Parent then 
+        if self.Parent.Type == Type then 
+            return self.Parent;
+        else
+            return self.Parent:FindFirstAncestorOfType(Type);
+        end 
+    end
+    return nil;
+end
+
+function class__Instance:FindFirstDescendantOfType(Type)
+    for _,Object in pairs(self:GetDescendants()) do 
+        if Object.Type == Type then 
+            return Object;
+        end
+    end 
+    return nil;
+end
+
+function class__Instance:Clone()
+    local main__Object = Instance.new(self.Type);
+    for _,Attribute in pairs(Instances[self.ID].__Attributes) do
+        if _ ~= "Parent" then
+            main__Object[_] = Attribute; 
+        end
+    end 
+    
+    local function Loop_Through_Children(Child,Parent)
+        local Children = Child:GetChildren();
+        if Children then 
+            for _,loop__Child in pairs(Children) do 
+                local cloned__Object = loop__Child:Clone();
+                cloned__Object.Parent = Parent;
+            end
+        end
+    end
+    Loop_Through_Children(Instances[self.ID],main__Object)
+
+    return main__Object;
+end
 
 local Instance = {
     Update_Draw_Order = Update_Draw_Order,
@@ -134,6 +193,8 @@ local Instance = {
             __Events = {
                 ChildAdded = createConnection(),
                 ChildRemoved = createConnection(),
+                DescendantAdded = createConnection(),
+                DescendantRemoved = createConnection(),
                 Destroying = createConnection(),
                 Changed = createConnection(),
             },
@@ -168,6 +229,7 @@ local Instance = {
             object__Attr.ZIndexBehavior = Enumerate.ZIndexBehavior.Sibling;
             object__Attr.Enabled = true;
             object__Attr.Visible = true;
+            object__Attr.ClipsChildren = false;
             object__Attr.BackgroundColor3 = Color3.new(255,255,255);
             object__Attr.BackgroundOpacity = 1;
             object__Attr.ZIndex = 1;
@@ -175,9 +237,9 @@ local Instance = {
 
             -- Events
 
-         object__Evnt.MouseEnter = createConnection();
-         object__Evnt.MouseLeave = createConnection();
-         object__Evnt.Changed:Connect(function(self, Index)
+            object__Evnt.MouseEnter = createConnection();
+            object__Evnt.MouseLeave = createConnection();
+            object__Evnt.Changed:Connect(function(self, Index)
                 if (Index == "Position") and object__Attr.Parent then
                     local Position = object__Attr.Position;
                     local X = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH*Position.X.Scale or object__Attr.Parent.AbsolutePosition.X+object__Attr.Parent.AbsoluteSize.X*Position.X.Scale;
@@ -194,6 +256,14 @@ local Instance = {
                     for _,Child in pairs(object__Chil) do 
                         Child.Changed:Fire("Size");
                     end
+                elseif (Index == "CanvasSize") then 
+                    local Size = object__Attr.CanvasSize;
+                    local X = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH or object__Attr.Parent.AbsoluteSize.X;
+                    local Y = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT or object__Attr.Parent.AbsoluteSize.Y;
+                    object__Attr.AbsoluteCanvasSize = Vector2.new(Size.X.Offset+X*Size.X.Scale,Size.Y.Offset+Y*Size.Y.Scale);
+                    for _,Child in pairs(object__Chil) do 
+                        Child.Changed:Fire("Size");
+                    end
                 elseif (Index == "ZIndex") then
                     Update_Draw_Order()
                 end
@@ -201,17 +271,24 @@ local Instance = {
 
             -- Branch Attributes / Events 
 
-            if Type == "TextBox" then 
+            if Type == "TextBox" or Type == "TextButton" then 
                 object__Attr.Text = "Textbox";
                 object__Attr.TextOpacity = 1;
                 object__Attr.TextScaled = true; -- need to add behavior for false
                 object__Attr.TextColor3 = Color3.new(0,0,0);
                 object__Attr.FontSize = 14; -- Need to add font size to ui_drawing
-            elseif Type == "Button" then 
-             object__Evnt.Button1Down = createConnection();
-             object__Evnt.Button2Down = createConnection();
-             object__Evnt.Button1Up = createConnection();
-             object__Evnt.Button2Up = createConnection();
+            end
+            if Type == "Button" or Type == "TextButton" then 
+                object__Evnt.Button1Down = createConnection();
+                object__Evnt.Button2Down = createConnection();
+                object__Evnt.Button1Up = createConnection();
+                object__Evnt.Button2Up = createConnection();
+            end
+            if Type == "ScrollingBox" then 
+                object__Attr.CanvasSize = UDim2.new(0,500,0,300);
+                object__Attr.CanvasPosition = Vector2.new(0,0);
+                object__Attr.AbsoluteCanvasSize = Vector2.new(500,300);
+                object__Attr.ClipsChildren = true;
             end
 
         end 
@@ -241,7 +318,9 @@ local Instance = {
                     if object__Attr.Parent then 
                         local Proxy = setmetatable({ID=self.ID,ProxyID=self.ProxyID},self);
                         -- Creates a clone of the proxy so the current one's memory can be cleared
-                        Instances[self.ID].ChildRemoved:Fire(Instances[self.ID]);
+                        Instances[self.ID].ChildRemoved:Fire(Proxy);
+                        Loop__Ancestory__Event(Value,"DescendantRemoved",Proxy);
+
                         rawset(object__Attr.Parent.__Children,self.ProxyID,nil);
                         -- Rawset allocates the memory directly
                         self = Proxy;
@@ -249,9 +328,10 @@ local Instance = {
                     if Value.Class then 
                         object__Attr.Parent = Value;
                         Value.__Children[self.ProxyID] = self;
-                        Value.__Events.ChildAdded:Fire(Instances[self.ID]);
-                     object__Evnt.Changed:Fire("Position");
-                     object__Evnt.Changed:Fire("Size");
+                        Value.ChildAdded:Fire(self);
+                        Loop__Ancestory__Event(Value,"DescendantAdded",self);
+                        object__Evnt.Changed:Fire("Position");
+                        object__Evnt.Changed:Fire("Size");
                         -- Updates the Object's Size and Position to become relative to the new parent
                     else
                         error("Parent must be an instance");
@@ -262,13 +342,13 @@ local Instance = {
                     else
                         error("Unable to add " .. type(Value) .. " to children")
                     end
-                elseif object__Attr[Index] then 
+                elseif object__Attr[Index] ~= nil then 
                     -- If the attribute exists, it changes the value.
                     -- This prevents new values from being added to the main object 
                     -- but allows already present values to be changed.
                     object__Attr[Index] = Value;
                     self.Changed:Fire(Index);
-                elseif Instances[self.ID].__Events[Index] then
+                elseif object__Evnt[Index] then
                     error("Cannot set value of event");
                 end
                 rawset(self,Index,nil);

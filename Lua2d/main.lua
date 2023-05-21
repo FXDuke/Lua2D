@@ -79,6 +79,10 @@ UI_Drawing = require("Modules/ui_drawing");
 
 Mouse = require("Modules/mouse");
 -- Mouse provides events for mouse behavior, as well as numerical values for mouse attributes
+
+StudioNavigation = require("Modules/navigation")
+
+
 local MouseHeld = {
     [1] = {};
     [2] = {};
@@ -127,7 +131,7 @@ function love.mousemoved(X,Y)
 end
 
 function love.mousepressed(X,Y,Button)
-    if Mouse.Hit.Type == "Button" and Mouse.Hit.Enabled then 
+    if (Mouse.Hit.Type == "Button" or Mouse.Hit.Type == "TextButton") and Mouse.Hit.Enabled then 
         Mouse.Hit["Button" .. Button .. "Down"]:Fire()
         table.insert(MouseHeld[Button],Mouse.Hit);
     end
@@ -155,12 +159,21 @@ function love.mousereleased(X,Y,Button)
 end
 
 function love.wheelmoved(x, y)
+    local Scrolling = Mouse.Hit.Type == "ScrollingBox" or Mouse.Hit:FindFirstAncestorOfType("ScrollingBox");
     if y > 0 then
-        Mouse.ScrollPosition = math.max(Mouse.ScrollPosition-1,0);
-        Mouse.ScrollForward:Fire();
+        if Scrolling and Scrolling ~= true then 
+            Scrolling.CanvasPosition = Vector2.new(0,math.max(Scrolling.CanvasPosition.Y-15,-Scrolling.AbsoluteCanvasSize.Y+Scrolling.AbsoluteSize.Y));
+        else
+            Mouse.ScrollPosition = math.max(Mouse.ScrollPosition-1,0);
+            Mouse.ScrollForward:Fire();
+        end
     elseif y < 0 then
-        Mouse.ScrollPosition = math.min(Mouse.ScrollPosition+1,15); -- Mouse max scroll out is 15
-        Mouse.ScrollBackward:Fire();
+        if Scrolling and Scrolling ~= true then 
+            Scrolling.CanvasPosition = Vector2.new(0,math.min(Scrolling.CanvasPosition.Y+15,0));
+        else
+            Mouse.ScrollPosition = math.min(Mouse.ScrollPosition+1,15); -- Mouse max scroll out is 15
+            Mouse.ScrollBackward:Fire();
+        end
     end
 end
 
