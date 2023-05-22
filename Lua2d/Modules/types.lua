@@ -1,4 +1,5 @@
-
+-- IN THE FUTURE IM GOING TO ADD A /Types/ FOLDER 
+-- AND HAVE EACH OF THESE IN AN INDIVIDUAL FILE FOR EASIER ACCESS
 
 local vector2__behavior = {
     __add = function(self,Object)

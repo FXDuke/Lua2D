@@ -15,6 +15,14 @@ local Explorer = Layout.Explorer;
 local Properties = Layout.Properties;
 local Output = Layout.Output;
 
+local UI__SCROLLING__CAST = Instance.new("ScrollingBox");
+UI__SCROLLING__CAST.Name = "Content";
+UI__SCROLLING__CAST.Size = UDim2.new(1,0,1,-30);
+UI__SCROLLING__CAST.Position = UDim2.new(0,0,0,30);
+UI__SCROLLING__CAST.CanvasSize = UDim2.new(1,0,0,0);
+UI__SCROLLING__CAST.BackgroundOpacity = 0;
+UI__SCROLLING__CAST.ZIndex = 2;
+
 ui_workspace.Parent = ui_service;
 ui_workspace.ClipsDescendants = true;
 ui_workspace.Name = "WorkspaceUI";
@@ -35,14 +43,8 @@ Explorer.Enabled = false;
 Explorer.Size = UDim2.new(0.2,0,0.525,0);
 Explorer.Position = UDim2.new(0.8,0,0.175,0);
 Explorer.BackgroundColor3 = Color3.new(0.4,0.4,0.4);
-local Explorer__Content = Instance.new("ScrollingBox");
+local Explorer__Content = UI__SCROLLING__CAST:Clone();
 Explorer__Content.Parent = Explorer;
-Explorer__Content.Name = "Content";
-Explorer__Content.Size = UDim2.new(1,0,1,-30);
-Explorer__Content.Position = UDim2.new(0,0,0,30);
-Explorer__Content.CanvasSize = UDim2.new(1,0,0,0);
-Explorer__Content.BackgroundOpacity = 0;
-Explorer__Content.ZIndex = 2;
 Properties.Parent = ui_service;
 Properties.Name = "Properties";
 Properties.ZIndex = 4;
@@ -50,14 +52,9 @@ Properties.Enabled = false;
 Properties.Size = UDim2.new(0.2,0,0.4,0);
 Properties.Position = UDim2.new(0.8,0,0.7,0);
 Properties.BackgroundColor3 = Color3.new(0.3,0.3,0.3);
-local Properties__Content = Instance.new("ScrollingBox");
+local Properties__Content = UI__SCROLLING__CAST:Clone();
 Properties__Content.Parent = Properties;
 Properties__Content.Name = "Content";
-Properties__Content.Size = UDim2.new(1,0,1,-30);
-Properties__Content.Position = UDim2.new(0,0,0,30);
-Properties__Content.CanvasSize = UDim2.new(1,0,0,0);
-Properties__Content.BackgroundOpacity = 0;
-Properties__Content.ZIndex = 5;
 Output.Parent = ui_service;
 Output.Name = "Output";
 Output.ZIndex = 0;
@@ -65,7 +62,11 @@ Output.Size = UDim2.new(0.8,0,0.2,0);
 Output.Position = UDim2.new(0,0,0.8,0);
 Output.BackgroundColor3 = Color3.new(0.2,0.2,0.2);
 
+UI__SCROLLING__CAST:Destroy();
+-- Clears memory
+
 local function MAINTAIN_UI_FORMAT()
+    -- This is temporary, do not expect full optimization.
 
     Navigator.Position = UDim2.new(0,0,0,0);
     Navigator.Size = UDim2.new(1,0,0.175,0);
@@ -84,31 +85,40 @@ local function MAINTAIN_UI_FORMAT()
 
 end
 
+local Header = Instance.new("TextButton");
+Header.Name = "Header";
+Header.Enabled = true;
+Header.BackgroundOpacity = 0.2;
+Header.TextOpacity = 0.7;
+Header.Size = UDim2.new(1,0,0,25);
+Header.ZIndex = 4;
+
 local function ADD_DYNAMIC_STUDIO_UI(Object)
-    local Header = Instance.new("TextButton");
-    Header.Parent = Object;
-    Header.Name = "Header";
-    Header.Text = Object.Name;
-    Header.Enabled = true;
-    Header.BackgroundOpacity = 0.2;
-    Header.TextOpacity = 0.7;
-    Header.Size = UDim2.new(1,0,0,25);
-    Header.ZIndex = 4;
-    Header.MouseEnter:Connect(function()
-        Tween:Create(Header,TweenInfo.new(0.1,Enumerate.EasingStyle.Sine),{TextOpacity=1}):Play();
+    -- This is temporary, do not expect full optimization.
+
+    local clone__Header = Header:Clone();
+    clone__Header.Parent = Object;
+    clone__Header.Text = Object.Name;
+
+    clone__Header.MouseEnter:Connect(function()
+        Tween:Create(clone__Header,TweenInfo.new(0.1,Enumerate.EasingStyle.Sine),{TextOpacity=1}):Play();
     end)
-    Header.MouseLeave:Connect(function()
-        Tween:Create(Header,TweenInfo.new(0.1,Enumerate.EasingStyle.Sine),{TextOpacity=0.5}):Play();
+    clone__Header.MouseLeave:Connect(function()
+        Tween:Create(clone__Header,TweenInfo.new(0.1,Enumerate.EasingStyle.Sine),{TextOpacity=0.5}):Play();
     end)
-    local Held = false;
-    local Button1Press = Object.Header.Button1Down:Connect(function()
-        Held = true;
+
+    local Mouse__Held = false;
+    local Button1Press = clone__Header.Button1Down:Connect(function()
+        Mouse__Held = true;
         local Old_Position = Mouse.Position;
+
         -- Temporary Color Change for Header to Show mouse has been pressed.
-        Tween:Create(Object.Header,TweenInfo.new(0.1,Enumerate.EasingStyle.Sine),{TextColor3=Color3.new(0,1,0)}):Play();
-        -- ^
+        Tween:Create(clone__Header,TweenInfo.new(0.1,Enumerate.EasingStyle.Sine),{TextColor3=Color3.new(0,1,0)}):Play();
+
         thread(function(Thread)
+
             Object.ZIndex = Object.ZIndex + 1;
+
             repeat 
                 Thread:Wait();
                 local New_Position = Mouse.Position;
@@ -122,15 +132,18 @@ local function ADD_DYNAMIC_STUDIO_UI(Object)
                 MAINTAIN_UI_FORMAT();
                 Old_Position = New_Position;
             until not Held;
+
             Object.ZIndex = Object.ZIndex - 1;
+
             Thread:Close();
         end):Play()
     end)
-    local Button1Release = Object.Header.Button1Up:Connect(function()
+    local Button1Release = clone__Header.Button1Up:Connect(function()
         -- Temporary Color Change for Header to Show mouse has been Released.
-        Tween:Create(Object.Header,TweenInfo.new(0.1,Enumerate.EasingStyle.Sine),{TextColor3=Color3.new(0,0,0)}):Play();
+        Tween:Create(clone__Header,TweenInfo.new(0.1,Enumerate.EasingStyle.Sine),{TextColor3=Color3.new(0,0,0)}):Play();
         -- ^
-        Held = false;
+        Mouse__Held = false;
+
     end)
     Object.Destroying:Once(function()
         -- When the object is destroyed, this function is fired once then the memory is cleared

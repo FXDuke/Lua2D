@@ -130,35 +130,31 @@ local function AddObject(_,Object,Object_Offset,Indent)
 
     local LastPressed__Thread;
 
-    text.Destroying:Once(function()
-        remove__Child__Event:Disconnect();
+    local LastPressed__Check = function()
         if LastPressed__Thread then 
             LastPressed__Thread:Close();
             Properties__Content:ClearChildren();
             LastPressed = nil;
+            return true;
         end 
+    end
+
+    text.Destroying:Once(function()
+        remove__Child__Event:Disconnect();
+        LastPressed__Check()
         add__Child__Event:Disconnect();
     end)
 
-    Object.Destroying:Once(function()
-        if LastPressed__Thread then 
-            LastPressed__Thread:Close();
-            Properties__Content:ClearChildren();
-            LastPressed = nil;
-        end 
-    end)
+    Object.Destroying:Once(LastPressed__Check)
 
     text.Label.Button1Up:Connect(function(self)
 
         if Object:FindFirstAncestor("Properties") then self:Disconnect(); return end; -- prevents stack overflow
         if LastPressed then 
             Tween:Create(LastPressed,TweenInfo.new(0.2,Enumerate.EasingStyle.Sine),{TextColor3=Color3.new(0,0,0)}):Play();
-            if LastPressed == text.Label then 
-                LastPressed = nil;
-                Properties__Content:ClearChildren();
-                return;
-            end 
+            if LastPressed__Check() then return end;
         end 
+
         Tween:Create(text.Label,TweenInfo.new(0.2,Enumerate.EasingStyle.Sine),{TextColor3=Color3.new(0,1,0)}):Play();
         LastPressed = text.Label
 
@@ -188,7 +184,9 @@ local function AddObject(_,Object,Object_Offset,Indent)
             Property__UI.Property_Value.Text = tostring(Property);
             Position_Index = Position_Index + 1;
         end 
+
         Properties__Content.CanvasSize = Properties__Content.CanvasSize + Vector2.new(0,(Position_Index+1)*32);
+
     end);
 
     text.Expand.Button1Up:Connect(function(self)
@@ -199,6 +197,7 @@ local function AddObject(_,Object,Object_Offset,Indent)
             self:Disconnect();
             return;
         end 
+
         local local__Object;
         local local__Object__Index = 0;
         for _,Obj in pairs(Navigation) do 
@@ -207,7 +206,9 @@ local function AddObject(_,Object,Object_Offset,Indent)
                 local__Object__Index = _;
             end
         end 
+
         if local__Object.Expanded then 
+
             local Index = 0;
             while Index < local__Object.End do
                 Index = Index + 1;
@@ -218,32 +219,43 @@ local function AddObject(_,Object,Object_Offset,Indent)
                     break;
                 end
             end
+            
             for Index=local__Object__Index+1,#Navigation do
                 Navigation[Index].Label.Position = Navigation[Index].Label.Position - local__Object.ExpandOffset;
             end
+
             text.Expand.Text = "+";
+
         else
+
             local local__Position__Offset = local__Object__Index;
             local Start = #Navigation;
+
             for _,Child in pairs(Object:GetChildren()) do 
                 local__Position__Offset = local__Position__Offset + 1;
                 AddObject({},Child,local__Position__Offset,Indent+2.5);
             end
+
             if #Navigation <= Start then return end;
             local Difference = (local__Position__Offset-local__Object__Index);
+
             text.Expand.Text = "-";
             local__Object.End = Difference;
             local__Object.ExpandOffset = Vector2.new(0,Difference*22)
+
             for Index=local__Position__Offset+1,#Navigation do
                 Navigation[Index].Label.Position = Navigation[Index].Label.Position + local__Object.ExpandOffset;
             end
+
         end
+
         local__Object.Expanded = not local__Object.Expanded;
+
     end)
-
+    
     Explorer__Content.CanvasSize = Explorer__Content.CanvasSize + Vector2.new(0,22);
-
     table.insert(Navigation,Object_Offset,{Instance=Object,Expanded = false,ExpandOffset = Vector2.new(0,0),Label = text,Children={},End=0});
+
     return Navigation[#Navigation];
 end
 

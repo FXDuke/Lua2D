@@ -25,6 +25,17 @@ end
 
 
 local EasingInfo = {
+    [0] = { -- Linear (idk how to do out or inout for linear...)
+        [0] = function(Alpha) -- in
+            return Alpha;
+        end,
+        [1] = function(Alpha) -- out 
+            return Alpha;
+        end,
+        [2] = function(Alpha) -- inout
+            return Alpha;
+        end,
+    },
     [1] = { -- Sine
         [0] = function(Alpha) -- in
             return 1 - math.cos((Alpha * math.pi) / 2);
@@ -75,10 +86,8 @@ function Tween:Create(Object,TweenInfo,PropertyTable)
         if Object[_] then 
             Differences[_] = {Origin=Object[_],Goal=Property-Object[_]};
         else
-            -- The Indexs of PropertyTable must be directly castabe to the Index of Object.__Attributes
-            if not Object then return end;
             error("Unable to cast " .. _ .. " to " .. tostring(Object));
-            break;
+            return;
         end
     end
     local tweenObject;
@@ -110,6 +119,12 @@ function Tween:Create(Object,TweenInfo,PropertyTable)
         Completed = createConnection(),
     },class__tween);
     return tweenObject;
+end
+
+function Tween:Close(Object)
+    if ActiveTweens[Object.ID] then 
+        ActiveTweens[Object.ID]:Close(); -- Closes the active tween so there is no con
+    end
 end
 
 return Tween;
