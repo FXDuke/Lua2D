@@ -1,3 +1,4 @@
+local NAVIGATION__CONFIG = config.NAVIGATOR__CONFIGURATIONS;
 
 local Position_Offset = 0;
 local Navigation = {};
@@ -5,56 +6,27 @@ local Navigation = {};
 local Explorer__Content = game.UIService.Explorer.Content;
 local Properties__Content = game.UIService.Properties.Content;
 local Explorer__Object = Instance.new("UI");
-Explorer__Object.Name = "Explorer__Object";
-Explorer__Object.Size = UDim2.new(1,0,0,20);
-Explorer__Object.Enabled = false;
-Explorer__Object.ZIndex = 2;
-Explorer__Object.BackgroundOpacity = 0;
+config.Cast(Explorer__Object,NAVIGATION__CONFIG["Explorer__Object"]);
 
 local Explorer__Label = Instance.new("TextButton");
 Explorer__Label.Parent = Explorer__Object;
-Explorer__Label.Name = "Label";
-Explorer__Label.Size = UDim2.new(1,-25,0,20);
-Explorer__Label.Position = UDim2.new(0,25,0,0);
-Explorer__Label.Text = "Label";
-Explorer__Label.BackgroundOpacity = 0.5;
-Explorer__Label.ZIndex = 3;
+config.Cast(Explorer__Label,NAVIGATION__CONFIG["Explorer__Label"]);
+
 
 local Explorer__Expand = Instance.new("TextButton");
 Explorer__Expand.Parent = Explorer__Object;
-Explorer__Expand.Name = "Expand";
-Explorer__Expand.Size = UDim2.new(0,20,0,20);
-Explorer__Expand.Position = UDim2.new(0,5,0,0);
-Explorer__Expand.Text = "+";
-Explorer__Expand.BackgroundOpacity = 0.5;
-Explorer__Expand.ZIndex = 3;
+config.Cast(Explorer__Expand,NAVIGATION__CONFIG["Explorer__Expand"]);
 
 local Properties__Object = Instance.new("UI");
-Properties__Object.Name = "Properties__Object";
-Properties__Object.Size = UDim2.new(1,0,0,30);
-Properties__Object.Enabled = true;
-Properties__Object.BackgroundOpacity = 0.5;
-Properties__Object.ZIndex = 4;
+config.Cast(Properties__Object,NAVIGATION__CONFIG["Properties__Object"])
 
 local Properties__Label = Instance.new("TextBox");
 Properties__Label.Parent = Properties__Object;
-Properties__Label.Name = "Property_Name";
-Properties__Label.Size = UDim2.new(0.4,0,0,30);
-Properties__Label.Position = UDim2.new(0,0,0,0);
-Properties__Label.Text = "Property_Name";
-Properties__Label.BackgroundOpacity = 0;
-Properties__Label.ZIndex = 5;
+config.Cast(Properties__Label,NAVIGATION__CONFIG["Properties__Label"])
 
 local Properties__Value = Instance.new("TextBox");
 Properties__Value.Parent = Properties__Object;
-Properties__Value.Name = "Property_Value";
-Properties__Value.Size = UDim2.new(0.6,-5,0,30);
-Properties__Value.Position = UDim2.new(0.4,5,0,0);
-Properties__Value.Text = "Property_Value";
-Properties__Value.BackgroundOpacity = 0;
-Properties__Value.ZIndex = 5;
-
-
+config.Cast(Properties__Value,NAVIGATION__CONFIG["Properties__Value"])
 
 local function RemoveObject(_,Object)
     for _,Obj in ipairs(Navigation) do 

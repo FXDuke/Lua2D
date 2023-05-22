@@ -1,68 +1,35 @@
 -- Module for getting the workspace UI size
-
+local STUDIO_CONFIG = config.STUDIO__OBJECT__CONFIGURATIONS;
 
 local Layout = {
     Navigator = Instance.new("UI"),
     Explorer = Instance.new("UI"),
     Properties = Instance.new("UI"),
     Output = Instance.new("UI"),
-    ui_workspace = Instance.new("UI");
+    WorkspaceUI = Instance.new("UI"),
 };
 
-local ui_workspace = Layout.ui_workspace;
 local Navigator = Layout.Navigator;
 local Explorer = Layout.Explorer;
 local Properties = Layout.Properties;
 local Output = Layout.Output;
+local WorkspaceUI = Layout.WorkspaceUI;
 
 local UI__SCROLLING__CAST = Instance.new("ScrollingBox");
-UI__SCROLLING__CAST.Name = "Content";
-UI__SCROLLING__CAST.Size = UDim2.new(1,0,1,-30);
-UI__SCROLLING__CAST.Position = UDim2.new(0,0,0,30);
-UI__SCROLLING__CAST.CanvasSize = UDim2.new(1,0,0,0);
-UI__SCROLLING__CAST.BackgroundOpacity = 0;
-UI__SCROLLING__CAST.ZIndex = 2;
+config.Cast(UI__SCROLLING__CAST,STUDIO_CONFIG.UI__SCROLLING__CAST);
 
-ui_workspace.Parent = ui_service;
-ui_workspace.ClipsDescendants = true;
-ui_workspace.Name = "WorkspaceUI";
-ui_workspace.ZIndex = 0;
-ui_workspace.Size = UDim2.new(0.8,0,0.625,0);
-ui_workspace.Position = UDim2.new(0,0,0.175,0);
-ui_workspace.BackgroundColor3 = Color3.new(1,1,1);
-Navigator.Parent = ui_service;
-Navigator.Name = "Navigator";
-Navigator.ZIndex = 0;
-Navigator.Size = UDim2.new(1,0,0.175,0);
-Navigator.Position = UDim2.new(0,0,0,0);
-Navigator.BackgroundColor3 = Color3.new(0.9,0.9,0.9);
-Explorer.Parent = ui_service;
-Explorer.Name = "Explorer";
-Explorer.ZIndex = 2;
-Explorer.Enabled = false;
-Explorer.Size = UDim2.new(0.2,0,0.525,0);
-Explorer.Position = UDim2.new(0.8,0,0.175,0);
-Explorer.BackgroundColor3 = Color3.new(0.4,0.4,0.4);
 local Explorer__Content = UI__SCROLLING__CAST:Clone();
 Explorer__Content.Parent = Explorer;
-Properties.Parent = ui_service;
-Properties.Name = "Properties";
-Properties.ZIndex = 4;
-Properties.Enabled = false;
-Properties.Size = UDim2.new(0.2,0,0.4,0);
-Properties.Position = UDim2.new(0.8,0,0.7,0);
-Properties.BackgroundColor3 = Color3.new(0.3,0.3,0.3);
+
 local Properties__Content = UI__SCROLLING__CAST:Clone();
 Properties__Content.Parent = Properties;
-Properties__Content.Name = "Content";
-Output.Parent = ui_service;
-Output.Name = "Output";
-Output.ZIndex = 0;
-Output.Size = UDim2.new(0.8,0,0.2,0);
-Output.Position = UDim2.new(0,0,0.8,0);
-Output.BackgroundColor3 = Color3.new(0.2,0.2,0.2);
 
 UI__SCROLLING__CAST:Destroy();
+
+for _,UI_ITEM in pairs(Layout) do 
+    config.Cast(UI_ITEM,STUDIO_CONFIG[_]);
+end 
+
 -- Clears memory
 
 local function MAINTAIN_UI_FORMAT()
@@ -80,18 +47,13 @@ local function MAINTAIN_UI_FORMAT()
     Output.Position = UDim2.new(0,0,Output.Position.Y.Scale,0);
     Output.Size = UDim2.new(Properties.Position.X.Scale,0,math.max(1-Output.Position.Y.Scale,0.2),0);
 
-    ui_workspace.Position = UDim2.new(0,0,Navigator.Size.Y.Scale,0);
-    ui_workspace.Size = UDim2.new(Explorer.Position.X.Scale,0,Output.Position.Y.Scale-Navigator.Size.Y.Scale,0);
+    WorkspaceUI.Position = UDim2.new(0,0,Navigator.Size.Y.Scale,0);
+    WorkspaceUI.Size = UDim2.new(Explorer.Position.X.Scale,0,Output.Position.Y.Scale-Navigator.Size.Y.Scale,0);
 
 end
 
 local Header = Instance.new("TextButton");
-Header.Name = "Header";
-Header.Enabled = true;
-Header.BackgroundOpacity = 0.2;
-Header.TextOpacity = 0.7;
-Header.Size = UDim2.new(1,0,0,25);
-Header.ZIndex = 4;
+config.Cast(Header,STUDIO_CONFIG["Header"]);
 
 local function ADD_DYNAMIC_STUDIO_UI(Object)
     -- This is temporary, do not expect full optimization.

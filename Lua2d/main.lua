@@ -26,12 +26,10 @@ task = require("Modules/task");
 -- Thread passes self as an argument when resumed which can be used to wait, close, or pause the thread
 thread = task.new;
 
-TYPES = require("Modules/types");
--- Module for the types that contains factories and behaviors 
-Vector2 = TYPES.Vector2;
-Color3 = TYPES.Color3;
-UDim = TYPES.UDim;
-UDim2 = TYPES.UDim2;
+Vector2 = require("Modules/Types/Vector2");
+Color3 = require("Modules/Types/Color3");
+UDim = require("Modules/Types/UDim");
+UDim2 = require("Modules/Types/UDim2");
 
 connections = require("Modules/connection");
 -- Creates reusable events that can be binded to or fired from any position in the program
@@ -46,10 +44,6 @@ waitForConnection = connections.waitForConnection;
 Instance = require("Modules/instance");
 -- Module for containing the Instance factories as well as instance behavior
 
-Tween = require("Modules/tween");
--- Uses a dictionary to cast values to the passed object and smoothly animates them to their goals
-TweenInfo = Tween.TweenInfo;
-
 game = Instance.new("Folder");
 -- Game will be a hub for services and events
 game.Name = "game";
@@ -63,15 +57,18 @@ ui_service.ScaleType = Enumerate.ScaleType.Global;
 ui_service.Name = "UIService"
 ui_service.Parent = game;
 ui_service.BackgroundOpacity = 0;
-
-ui_service.ZIndex = 0;
 ui_service.Size = UDim2.new(1,0,1,0);
-ui_service.Position = UDim2.new(0,0,0,0);
+
+config = require("Modules/config");
+
+Tween = require("Modules/tween");
+-- Uses a dictionary to cast values to the passed object and smoothly animates them to their goals
+TweenInfo = Tween.TweenInfo;
 
 STUDIO_UI = require("Modules/studio_ui");
 -- The framework for what will be the UI for explorer and editor the workspace and ui worlds (Values should be locked and only changed by events / methods)
 -- Automatically maintains UI Format for standard UI
-ui_workspace = STUDIO_UI.ui_workspace;
+WorkspaceUI = STUDIO_UI.WorkspaceUI;
 -- workplace_ui will manage what is drawn in the workspace / game 
 
 UI_Drawing = require("Modules/ui_drawing");
@@ -229,8 +226,6 @@ end
 
 -- Edit this script to test instead of filling up the main.lua file (in the future this will be what is executed in tests)
 local Executed__Script = require("editor");
-
-
 
 -- temporary line counter
 local a = require("temp_line_counter")

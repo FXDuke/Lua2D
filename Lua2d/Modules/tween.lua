@@ -24,46 +24,7 @@ end
 
 
 
-local EasingInfo = {
-    [0] = { -- Linear (idk how to do out or inout for linear...)
-        [0] = function(Alpha) -- in
-            return Alpha;
-        end,
-        [1] = function(Alpha) -- out 
-            return Alpha;
-        end,
-        [2] = function(Alpha) -- inout
-            return Alpha;
-        end,
-    },
-    [1] = { -- Sine
-        [0] = function(Alpha) -- in
-            return 1 - math.cos((Alpha * math.pi) / 2);
-        end,
-        [1] = function(Alpha) -- out 
-            return math.sin((Alpha * math.pi) / 2);
-        end,
-        [2] = function(Alpha) -- inout
-            return -(math.cos(math.pi * Alpha) - 1) / 2;
-        end,
-    },
-    [2] = { -- Elastic 
-        [0] = function(Alpha) -- in
-            local c4 = (2 * math.pi) / 3;
-            return Alpha == 0 and 0 or Alpha == 1 and 1 or -math.pow(2, 10 * Alpha - 10) * math.sin((Alpha * 10 - 10.75) * c4);
-        end,
-        [1] = function(Alpha) -- out
-            local c4 = (2 * math.pi) / 3;
-
-            return Alpha == 0 and 0 or Alpha == 1 and 1 or math.pow(2, -10 * Alpha) * math.sin((Alpha * 10 - 0.75) * c4) + 1;
-        end,
-        [2] = function(Alpha) -- inout
-            local c5 = (2 * math.pi) / 4.5;
-
-            return Alpha == 0 and 0 or Alpha == 1 and 1 or Alpha < 0.5 and -(math.pow(2, 20 * Alpha - 10) * math.sin((20 * Alpha - 11.125) * c5)) / 2 or (math.pow(2, -20 * Alpha + 10) * math.sin((20 * Alpha - 11.125) * c5)) / 2 + 1;
-        end,
-    },
-};
+local EasingInfo = config.EasingStyle;
 
 local ActiveTweens = {}; -- stores the active tweens and prevents overlap
 
