@@ -67,7 +67,7 @@ local udim__behavior = {
         end
     end,
     __tostring = function(UDim)
-        return "{Scale = " .. UDim.Scale .. ", Offset = " .. UDim.Offset .. "}";
+        return "{" .. UDim.Scale .. ", " .. UDim.Offset .. "}";
     end,
 };
 udim__behavior.__index = udim__behavior;

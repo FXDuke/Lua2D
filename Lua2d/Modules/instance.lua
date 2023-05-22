@@ -5,7 +5,7 @@ local DrawOrder = {};
 
 local function Update_Draw_Order()
     DrawOrder = {};
-    for _,UIObject in pairs(ui_service:GetDescendants()) do 
+    for _,UIObject in pairs(ui_service:GetChildren()) do 
         local ZIndex = UIObject.ZIndex;
         DrawOrder[ZIndex] = DrawOrder[ZIndex] or {};
         table.insert(DrawOrder[ZIndex],UIObject);
@@ -97,6 +97,7 @@ function class__Instance:GetDescendants()
 end
 
 function class__Instance:Destroy()
+    Tween:Create(self,TweenInfo.new(0,Enumerate.EasingStyle.Sine),{}):Play();
     self.Destroying:Fire();
     for _,Child in pairs(self.__Children) do 
         Child:Destroy();
@@ -108,7 +109,7 @@ function class__Instance:Destroy()
         self.Parent.ChildRemoved:Fire(self);
         Loop__Ancestory__Event(self.Parent,"DescendantRemoved",self);
         rawset(self.Parent.__Children,self.__Proxy.ProxyID,nil);
-    end
+    end 
     rawset(Instances, self.ID, nil);
     self = nil;
     Update_Draw_Order()
@@ -163,6 +164,12 @@ function class__Instance:Clone()
     Loop_Through_Children(Instances[self.ID],main__Object)
 
     return main__Object;
+end
+
+function class__Instance:ClearChildren()
+    for _,Child in pairs(self:GetChildren()) do 
+        Child:Destroy();
+    end
 end
 
 local Instance = {
@@ -229,7 +236,7 @@ local Instance = {
             object__Attr.ZIndexBehavior = Enumerate.ZIndexBehavior.Sibling;
             object__Attr.Enabled = true;
             object__Attr.Visible = true;
-            object__Attr.ClipsChildren = false;
+            object__Attr.ClipsDescendants = false;
             object__Attr.BackgroundColor3 = Color3.new(255,255,255);
             object__Attr.BackgroundOpacity = 1;
             object__Attr.ZIndex = 1;
@@ -288,7 +295,7 @@ local Instance = {
                 object__Attr.CanvasSize = UDim2.new(0,500,0,300);
                 object__Attr.CanvasPosition = Vector2.new(0,0);
                 object__Attr.AbsoluteCanvasSize = Vector2.new(500,300);
-                object__Attr.ClipsChildren = true;
+                object__Attr.ClipsDescendants = true;
             end
 
         end 

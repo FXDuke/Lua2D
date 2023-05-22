@@ -16,7 +16,7 @@ local Properties = Layout.Properties;
 local Output = Layout.Output;
 
 ui_workspace.Parent = ui_service;
-ui_workspace.ClipsChildren = true;
+ui_workspace.ClipsDescendants = true;
 ui_workspace.Name = "WorkspaceUI";
 ui_workspace.ZIndex = 0;
 ui_workspace.Size = UDim2.new(0.8,0,0.625,0);
@@ -30,7 +30,8 @@ Navigator.Position = UDim2.new(0,0,0,0);
 Navigator.BackgroundColor3 = Color3.new(0.9,0.9,0.9);
 Explorer.Parent = ui_service;
 Explorer.Name = "Explorer";
-Explorer.ZIndex = 0;
+Explorer.ZIndex = 2;
+Explorer.Enabled = false;
 Explorer.Size = UDim2.new(0.2,0,0.525,0);
 Explorer.Position = UDim2.new(0.8,0,0.175,0);
 Explorer.BackgroundColor3 = Color3.new(0.4,0.4,0.4);
@@ -44,7 +45,8 @@ Explorer__Content.BackgroundOpacity = 0;
 Explorer__Content.ZIndex = 2;
 Properties.Parent = ui_service;
 Properties.Name = "Properties";
-Properties.ZIndex = 0;
+Properties.ZIndex = 4;
+Properties.Enabled = false;
 Properties.Size = UDim2.new(0.2,0,0.4,0);
 Properties.Position = UDim2.new(0.8,0,0.7,0);
 Properties.BackgroundColor3 = Color3.new(0.3,0.3,0.3);
@@ -55,7 +57,7 @@ Properties__Content.Size = UDim2.new(1,0,1,-30);
 Properties__Content.Position = UDim2.new(0,0,0,30);
 Properties__Content.CanvasSize = UDim2.new(1,0,0,0);
 Properties__Content.BackgroundOpacity = 0;
-Properties__Content.ZIndex = 2;
+Properties__Content.ZIndex = 5;
 Output.Parent = ui_service;
 Output.Name = "Output";
 Output.ZIndex = 0;
@@ -64,6 +66,9 @@ Output.Position = UDim2.new(0,0,0.8,0);
 Output.BackgroundColor3 = Color3.new(0.2,0.2,0.2);
 
 local function MAINTAIN_UI_FORMAT()
+
+    Navigator.Position = UDim2.new(0,0,0,0);
+    Navigator.Size = UDim2.new(1,0,0.175,0);
 
     Explorer.Position = UDim2.new(Explorer.Position.X.Scale,0,Navigator.Size.Y.Scale,0);
     Explorer.Size = UDim2.new(Explorer.Size.X.Scale,0,Properties.Position.Y.Scale-Navigator.Size.Y.Scale,0);
@@ -76,6 +81,7 @@ local function MAINTAIN_UI_FORMAT()
 
     ui_workspace.Position = UDim2.new(0,0,Navigator.Size.Y.Scale,0);
     ui_workspace.Size = UDim2.new(Explorer.Position.X.Scale,0,Output.Position.Y.Scale-Navigator.Size.Y.Scale,0);
+
 end
 
 local function ADD_DYNAMIC_STUDIO_UI(Object)
@@ -87,7 +93,7 @@ local function ADD_DYNAMIC_STUDIO_UI(Object)
     Header.BackgroundOpacity = 0.2;
     Header.TextOpacity = 0.7;
     Header.Size = UDim2.new(1,0,0,25);
-    Header.ZIndex = 1;
+    Header.ZIndex = 4;
     Header.MouseEnter:Connect(function()
         Tween:Create(Header,TweenInfo.new(0.1,Enumerate.EasingStyle.Sine),{TextOpacity=1}):Play();
     end)

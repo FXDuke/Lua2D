@@ -16,8 +16,8 @@ end
 
 function class__tween:Close()
     self.PlaybackState = Enumerate.PlaybackState.Completed;
-    self.Thread:Close();
     self.Completed:Fire();
+    self.Thread:Close();   
     self = nil;
 end
 -- Completely Closes the Tween, Abruptly stopping the animation where it is at
@@ -76,21 +76,25 @@ function Tween:Create(Object,TweenInfo,PropertyTable)
             Differences[_] = {Origin=Object[_],Goal=Property-Object[_]};
         else
             -- The Indexs of PropertyTable must be directly castabe to the Index of Object.__Attributes
-            error("Unable to cast " .. _ .. " to Object");
+            if not Object then return end;
+            error("Unable to cast " .. _ .. " to " .. tostring(Object));
             break;
         end
     end
-    local tweenObject = setmetatable({
+    local tweenObject;
+    tweenObject = setmetatable({
         Thread = thread(function(Thread)
-            if ActiveTweens[Object.ID] then 
-                ActiveTweens[Object.ID]:Close(); -- Closes the active tween so there is no con
+            local Object__ID = Object.ID;
+            if ActiveTweens[Object__ID] then 
+                ActiveTweens[Object__ID]:Close(); -- Closes the active tween so there is no con
             end
-            ActiveTweens[Object.ID] = tweenObject;
+            local TweenInfo = TweenInfo;
+            ActiveTweens[Object__ID] = tweenObject;
             while TweenInfo.RepeatCount > 0 do 
                 Thread:Wait(TweenInfo.Delay);
                 local Alpha = 0;
                 local Start = os.clock();
-                while Alpha < 1 do
+                while Alpha < 1 and Object do
                     Alpha = Tween.GetAlpha((os.clock()-Start)/TweenInfo.Time,TweenInfo.EasingStyle,TweenInfo.EasingDirection);
                     for _,Property in pairs(PropertyTable) do 
                         Object[_] = Differences[_].Origin + (Differences[_].Goal*Alpha);
@@ -99,8 +103,8 @@ function Tween:Create(Object,TweenInfo,PropertyTable)
                 end
                 TweenInfo.RepeatCount = TweenInfo.RepeatCount - 1;
             end 
-            ActiveTweens[Object.ID] = nil;
             tweenObject:Close();
+            ActiveTweens[Object__ID] = nil;
         end),
         PlaybackState = Enumerate.PlaybackState.Normal,
         Completed = createConnection(),

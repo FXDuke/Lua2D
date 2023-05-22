@@ -1,28 +1,5 @@
-NOTES FOR THIS UPDATE
+nobody is even reading this so im not going to waste my time and add a full length update 
 
-ADDED:
+pretty much just fixed some bugs and added Modules/navigator
 
-INSTANCE:
-
-*** Clone:                      Method, Returns a clone of the instance
-
-- FindFirstChildOfType:         Method, Finds first child of specified type
-- FindFirstDescendantOfType:    Method, Finds first descendant of specified type
-- FindFirstAncestorOfType:      Method, Finds first ancestor of specified type
-
-- TextButton:    Instance        Type,   Acts as a button, and a text label
-- ScrollingBox:  Instance        Type,   Allows the user to scroll through a container
-
-- ClipsChildren: Instance(UI)    boolean, Determines if children of the object are clipped when exceeding parent's bounds
-
-STUDIO__UI:
-
-- Made name labels text buttons an
-- ScrollingBox's for Explorer and Properties
-
-CHANGED:
-
-
-FIXES:
-
-- Many Bugs with Destroy method
+improved efficiency for the drawing but it can get better

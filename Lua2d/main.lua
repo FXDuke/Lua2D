@@ -90,28 +90,50 @@ local MouseHeld = {
 -- Table for instances with a mouse button event fired to ensure they are released when the button is;
 
 love.graphics.setBackgroundColor(1,1,1);
+local function draw__UI__Children(UI,Boundary)
+    -- Boundary is for ClipsDescendants
+    for _,Instance in pairs(UI:GetChildren()) do 
+        if Instance.Class == "UI" then 
+            UI_Drawing[Instance.Type](Instance,Boundary);
+            local Boundary = Boundary or {Position=Instance.AbsolutePosition,Size=Instance.AbsoluteSize};
+            local NewBoundary = Boundary;
+            if Instance.ClipsDescendants then 
+                NewBoundary.Position.X = Boundary.Position.X < Instance.AbsolutePosition.X and Instance.AbsolutePosition.X or Boundary.Position.X;
+                NewBoundary.Position.Y = Boundary.Position.Y > Instance.AbsolutePosition.Y and Instance.AbsolutePosition.Y or Boundary.Position.Y;
+                NewBoundary.Size.X = Boundary.Size.X > Instance.AbsoluteSize.X and Instance.AbsoluteSize.X or Boundary.Size.X;
+                NewBoundary.Size.Y = Boundary.Size.Y > Instance.AbsoluteSize.Y and Instance.AbsoluteSize.Y or Boundary.Size.Y;
+            end
+            
+            draw__UI__Children(Instance,NewBoundary);
+        end
+    end
+end
+local dt =0;
 function love.draw()
     for _,ZIndex in pairs(Instance.getDrawOrder()) do 
         -- Draw Order is a table updated every time an instance under the UI Class's ZIndex changes
         for _,Instance in ipairs(ZIndex) do 
             if Instance.Class == "UI" then
-                if Instance.__Attributes.Visible then 
-                    UI_Drawing[Instance.Type](Instance);
-                end
+                UI_Drawing[Instance.Type](Instance);
             end
+            draw__UI__Children(Instance,Instance.ClipsDescendants and {Position=Instance.AbsolutePosition,Size=Instance.AbsoluteSize});
         end
     end
+    love.graphics.print(math.floor(1/dt),10,10)
 end
 
 function love.mousemoved(X,Y)
     Mouse.Position = Vector2.new(X,Y);
     for _,UIObject in pairs(ui_service:GetDescendants()) do 
-        if UIObject.Visible and UIObject.Enabled and Mouse.Hit then
+        if UIObject.Visible == true and UIObject.Enabled == true and Mouse.Hit then
             local Position = UIObject.AbsolutePosition;
+            if UIObject:FindFirstAncestorOfType("ScrollingBox") then 
+                Position = Position + UIObject:FindFirstAncestorOfType("ScrollingBox").CanvasPosition;
+            end 
             local Size = UIObject.AbsoluteSize;
             local Boundary = (X >= Position.X and X <= Position.X+Size.X) and (Y >= Position.Y and Y <= Position.Y+Size.Y);
             -- Boundary is a boolean that checks if the mouse is inside of the UI 
-            if Boundary and Mouse.Hit ~= UIObject and UIObject.ZIndex >= Mouse.Hit.ZIndex and Mouse.Hit.Enabled then 
+            if Boundary and Mouse.Hit ~= UIObject and UIObject.ZIndex >= Mouse.Hit.ZIndex then 
                 Mouse.Hit.MouseLeave:Fire();
                 Mouse.Hit = UIObject;
                 UIObject.MouseEnter:Fire();
@@ -198,6 +220,7 @@ function love.mousefocus(Focus)
 end
 
 function love.update(DeltaTime)
+    dt = DeltaTime
     task.Update();
 end
 
