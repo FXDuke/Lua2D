@@ -156,6 +156,7 @@ function class__Instance:Clone()
             for _,loop__Child in pairs(Children) do 
                 local cloned__Object = loop__Child:Clone();
                 cloned__Object.Parent = Parent;
+                Loop_Through_Children(loop__Child,cloned__Object);
             end
         end
     end
