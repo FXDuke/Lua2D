@@ -59,15 +59,19 @@ Properties__Value.ZIndex = 5;
 local function RemoveObject(_,Object)
     for _,Obj in ipairs(Navigation) do 
         if Obj.Instance == Object then 
-            local Index = 0
-            while Index < Obj.End do
-                Index = Index + 1;
-                if Navigation[_+1] then 
-                    RemoveObject({},Navigation[_+1].Instance);
+            if Obj.Expanded then 
+                local Index = 0;
+                while Index < Obj.End do
+                    Index = Index + 1;
+                    if Navigation[_+1] then 
+                        RemoveObject({},Navigation[_+1].Instance);
+                    else 
+                        break;
+                    end
                 end
-            end
-            for Index=_+1,#Navigation do
-                Navigation[Index].Label.Position = Navigation[Index].Label.Position - Obj.ExpandOffset;
+                for Index=_+1,#Navigation do
+                    Navigation[Index].Label.Position = Navigation[Index].Label.Position - Obj.ExpandOffset;
+                end
             end
             Properties__Content.CanvasSize = Properties__Content.CanvasSize - Vector2.new(0,32);
             Obj.Label:Destroy();
@@ -128,16 +132,20 @@ local function AddObject(_,Object,Object_Offset,Indent)
     local LastPressed__Thread;
 
     text.Destroying:Once(function()
-        if LastPressed__Thread then 
-            LastPressed__Thread:Close();
-        end
-        add__Child__Event:Disconnect();
         remove__Child__Event:Disconnect();
+        if LastPressed == text.Label then 
+            LastPressed__Thread:Close();
+            Properties__Content:ClearChildren();
+            LastPressed = nil;
+        end 
+        add__Child__Event:Disconnect();
+        
     end)
 
     Object.Destroying:Once(function()
         if LastPressed == text.Label then 
             LastPressed__Thread:Close();
+            Properties__Content:ClearChildren();
             LastPressed = nil;
         end 
     end)
@@ -193,11 +201,13 @@ local function AddObject(_,Object,Object_Offset,Indent)
             end
         end 
         if local__Object.Expanded then 
-            local Index = 0
+            local Index = 0;
             while Index < local__Object.End do
                 Index = Index + 1;
                 if Navigation[local__Object__Index+1] then 
                     RemoveObject({},Navigation[local__Object__Index+1].Instance);
+                else 
+                    break;
                 end
             end
             for Index=local__Object__Index+1,#Navigation do
