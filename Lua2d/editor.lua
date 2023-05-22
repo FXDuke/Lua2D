@@ -52,3 +52,4 @@ Button.Button1Up:Connect(function()
         local__Bullet:Destroy();
     end):Play();
 end)
+

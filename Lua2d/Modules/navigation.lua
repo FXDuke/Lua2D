@@ -145,6 +145,11 @@ local function AddObject(_,Object,Object_Offset,Indent)
     local function local__update__properties()
         if LastPressed then 
             Tween:Create(LastPressed,TweenInfo.new(0.2,Enumerate.EasingStyle.Sine),{TextColor3=Color3.new(0,0,0)}):Play();
+            if LastPressed == text.Label then 
+                Properties__Content:ClearChildren();
+                LastPressed = nil;
+                return;
+            end 
         end 
         Tween:Create(text.Label,TweenInfo.new(0.2,Enumerate.EasingStyle.Sine),{TextColor3=Color3.new(0,1,0)}):Play();
         LastPressed = text.Label

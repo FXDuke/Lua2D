@@ -226,3 +226,8 @@ end
 
 -- Edit this script to test instead of filling up the main.lua file (in the future this will be what is executed in tests)
 local Executed__Script = require("editor");
+
+
+
+-- temporary line counter
+local a = require("temp_line_counter")
