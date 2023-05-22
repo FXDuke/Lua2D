@@ -73,7 +73,6 @@ local function RemoveObject(_,Object)
                     Navigation[Index].Label.Position = Navigation[Index].Label.Position - Obj.ExpandOffset;
                 end
             end
-            Properties__Content.CanvasSize = Properties__Content.CanvasSize - Vector2.new(0,32);
             Obj.Label:Destroy();
             table.remove(Navigation,_);
         end
@@ -133,29 +132,30 @@ local function AddObject(_,Object,Object_Offset,Indent)
 
     text.Destroying:Once(function()
         remove__Child__Event:Disconnect();
-        if LastPressed == text.Label then 
+        if LastPressed__Thread then 
             LastPressed__Thread:Close();
             Properties__Content:ClearChildren();
             LastPressed = nil;
         end 
         add__Child__Event:Disconnect();
-        
     end)
 
     Object.Destroying:Once(function()
-        if LastPressed == text.Label then 
+        if LastPressed__Thread then 
             LastPressed__Thread:Close();
             Properties__Content:ClearChildren();
             LastPressed = nil;
         end 
     end)
 
-    local function local__update__properties()
+    text.Label.Button1Up:Connect(function(self)
+
+        if Object:FindFirstAncestor("Properties") then self:Disconnect(); return end; -- prevents stack overflow
         if LastPressed then 
             Tween:Create(LastPressed,TweenInfo.new(0.2,Enumerate.EasingStyle.Sine),{TextColor3=Color3.new(0,0,0)}):Play();
             if LastPressed == text.Label then 
-                Properties__Content:ClearChildren();
                 LastPressed = nil;
+                Properties__Content:ClearChildren();
                 return;
             end 
         end 
@@ -177,6 +177,7 @@ local function AddObject(_,Object,Object_Offset,Indent)
 
         Properties__Content:ClearChildren();
         Properties__Content.CanvasSize = UDim2.new(1,0,0,0);
+        Properties__Content.CanvasPosition = Vector2.new(0,0);
 
         local Position_Index = 0;
         for _,Property in pairs(Object.__Attributes) do 
@@ -188,10 +189,16 @@ local function AddObject(_,Object,Object_Offset,Indent)
             Position_Index = Position_Index + 1;
         end 
         Properties__Content.CanvasSize = Properties__Content.CanvasSize + Vector2.new(0,(Position_Index+1)*32);
-    end
+    end);
 
-    text.Label.Button1Up:Connect(local__update__properties);
     text.Expand.Button1Up:Connect(function(self)
+        if Object:FindFirstAncestor("Explorer") then
+            -- If you open explorer, it creates an explorer object for everything in explorer, which causes
+            -- a stack overflow. 
+            text.Expand.Text = "*";
+            self:Disconnect();
+            return;
+        end 
         local local__Object;
         local local__Object__Index = 0;
         for _,Obj in pairs(Navigation) do 
@@ -206,6 +213,7 @@ local function AddObject(_,Object,Object_Offset,Indent)
                 Index = Index + 1;
                 if Navigation[local__Object__Index+1] then 
                     RemoveObject({},Navigation[local__Object__Index+1].Instance);
+                    Explorer__Content.CanvasSize = Explorer__Content.CanvasSize - Vector2.new(0,22);
                 else 
                     break;
                 end

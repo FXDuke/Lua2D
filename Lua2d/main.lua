@@ -125,7 +125,7 @@ end
 function love.mousemoved(X,Y)
     Mouse.Position = Vector2.new(X,Y);
     for _,UIObject in pairs(ui_service:GetDescendants()) do 
-        if UIObject.Visible == true and UIObject.Enabled == true and Mouse.Hit then
+        if UIObject.Visible == true and UIObject.Enabled == true then
             local Position = UIObject.AbsolutePosition;
             if UIObject:FindFirstAncestorOfType("ScrollingBox") then 
                 Position = Position + UIObject:FindFirstAncestorOfType("ScrollingBox").CanvasPosition;
@@ -181,16 +181,19 @@ function love.mousereleased(X,Y,Button)
 end
 
 function love.wheelmoved(x, y)
-    local Scrolling = Mouse.Hit.Type == "ScrollingBox" or Mouse.Hit:FindFirstAncestorOfType("ScrollingBox");
+    local Scrolling = Mouse.Hit.Type == "ScrollingBox" and Mouse.Hit or Mouse.Hit:FindFirstAncestorOfType("ScrollingBox");
+    if Scrolling then 
+        Mouse.Hit = Scrolling;
+    end 
     if y > 0 then
-        if Scrolling and Scrolling ~= true then 
+        if Scrolling then
             Scrolling.CanvasPosition = Vector2.new(0,math.max(Scrolling.CanvasPosition.Y-15,-Scrolling.AbsoluteCanvasSize.Y+Scrolling.AbsoluteSize.Y));
         else
             Mouse.ScrollPosition = math.max(Mouse.ScrollPosition-1,0);
             Mouse.ScrollForward:Fire();
         end
     elseif y < 0 then
-        if Scrolling and Scrolling ~= true then 
+        if Scrolling then 
             Scrolling.CanvasPosition = Vector2.new(0,math.min(Scrolling.CanvasPosition.Y+15,0));
         else
             Mouse.ScrollPosition = math.min(Mouse.ScrollPosition+1,15); -- Mouse max scroll out is 15
