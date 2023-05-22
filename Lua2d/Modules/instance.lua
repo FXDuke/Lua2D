@@ -210,9 +210,9 @@ local Instance = {
 
         -- Applying Class
         local local__object = Instances[ID];
-        local object__Attr = Instances[ID].__Attributes;
-        local object__Evnt = Instances[ID].__Events;
-        local object__Chil = Instances[ID].__Children;
+        local object__Attr = local__object.__Attributes;
+        local object__Evnt = local__object.__Events;
+        local object__Chil = local__object.__Children;
         object__Attr.Class = Branch;
         object__Attr.Name = Type;
 
@@ -302,19 +302,19 @@ local Instance = {
 
         -- Creating Proxy
 
-        Instances[ID].__Proxy = setmetatable({
-            ProxyID = tostring(Instances[ID]);
+        local__object.__Proxy = setmetatable({
+            ProxyID = tostring(local__object);
         },{
             __index = function(self,Index)
-                if Instances[ID] then
+                if local__object then
                     if object__Attr[Index] then -- returns the attribute with the index passed
                         return object__Attr[Index];
                     elseif object__Evnt[Index] then -- returns the event with the index passed
                         return object__Evnt[Index];
-                    elseif Instances[ID]:FindFirstChild(Index) then -- returns the child with the index passed (if a child is found)
-                        return Instances[ID]:FindFirstChild(Index);
+                    elseif local__object:FindFirstChild(Index) then -- returns the child with the index passed (if a child is found)
+                        return local__object:FindFirstChild(Index);
                     else
-                        return Instances[ID].__index[Index];
+                        return local__object.__index[Index];
                     end
                 else
                     return nil;
@@ -365,11 +365,11 @@ local Instance = {
                 return self.Name;
             end;
             __call = function(self,...)
-                return Instances[self.ID];
+                return local__object;
             end
         });
 
-        return Instances[ID].__Proxy;
+        return local__object.__Proxy;
     end,
 };
 
