@@ -147,9 +147,7 @@ end
 function class__Instance:Clone()
     local main__Object = Instance.new(self.Type);
     for _,Attribute in pairs(Instances[self.ID].__Attributes) do
-        if _ ~= "Parent" then
-            main__Object[_] = Attribute; 
-        end
+        main__Object[_] = Attribute; 
     end 
     
     local function Loop_Through_Children(Child,Parent)
@@ -194,6 +192,7 @@ local Instance = {
             Type = Type,
             Class = Branch,
             ID = ID,
+            Parent = nil,
             __Children = {},
             __Attributes = {
             },
@@ -209,7 +208,7 @@ local Instance = {
         Instances[ID].__index = Instances[ID];
 
         -- Applying Class
-
+        local local__object = Instances[ID];
         local object__Attr = Instances[ID].__Attributes;
         local object__Evnt = Instances[ID].__Events;
         local object__Chil = Instances[ID].__Children;
@@ -247,26 +246,26 @@ local Instance = {
             object__Evnt.MouseEnter = createConnection();
             object__Evnt.MouseLeave = createConnection();
             object__Evnt.Changed:Connect(function(self, Index)
-                if (Index == "Position") and object__Attr.Parent then
+                if (Index == "Position") and local__object.Parent then
                     local Position = object__Attr.Position;
-                    local X = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH*Position.X.Scale or object__Attr.Parent.AbsolutePosition.X+object__Attr.Parent.AbsoluteSize.X*Position.X.Scale;
-                    local Y = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT*Position.Y.Scale or object__Attr.Parent.AbsolutePosition.Y+object__Attr.Parent.AbsoluteSize.Y*Position.Y.Scale;
+                    local X = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH*Position.X.Scale or local__object.Parent.AbsolutePosition.X+local__object.Parent.AbsoluteSize.X*Position.X.Scale;
+                    local Y = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT*Position.Y.Scale or local__object.Parent.AbsolutePosition.Y+local__object.Parent.AbsoluteSize.Y*Position.Y.Scale;
                     object__Attr.AbsolutePosition = Vector2.new(Position.X.Offset+X, Position.Y.Offset+Y);
                     for _,Child in pairs(object__Chil) do 
                         Child.Changed:Fire("Position");
                     end
-                elseif (Index == "Size") and object__Attr.Parent then 
+                elseif (Index == "Size") and local__object.Parent then 
                     local Size = object__Attr.Size;
-                    local X = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH or object__Attr.Parent.AbsoluteSize.X;
-                    local Y = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT or object__Attr.Parent.AbsoluteSize.Y;
+                    local X = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH or local__object.Parent.AbsoluteSize.X;
+                    local Y = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT or local__object.Parent.AbsoluteSize.Y;
                     object__Attr.AbsoluteSize = Vector2.new(Size.X.Offset+X*Size.X.Scale,Size.Y.Offset+Y*Size.Y.Scale);
                     for _,Child in pairs(object__Chil) do 
                         Child.Changed:Fire("Size");
                     end
                 elseif (Index == "CanvasSize") then 
                     local Size = object__Attr.CanvasSize;
-                    local X = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH or object__Attr.Parent.AbsoluteSize.X;
-                    local Y = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT or object__Attr.Parent.AbsoluteSize.Y;
+                    local X = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH or local__object.Parent.AbsoluteSize.X;
+                    local Y = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT or local__object.Parent.AbsoluteSize.Y;
                     object__Attr.AbsoluteCanvasSize = Vector2.new(Size.X.Offset+X*Size.X.Scale,Size.Y.Offset+Y*Size.Y.Scale);
                     for _,Child in pairs(object__Chil) do 
                         Child.Changed:Fire("Size");
@@ -325,15 +324,15 @@ local Instance = {
                     if object__Attr.Parent then 
                         local Proxy = setmetatable({ID=self.ID,ProxyID=self.ProxyID},self);
                         -- Creates a clone of the proxy so the current one's memory can be cleared
-                        Instances[self.ID].ChildRemoved:Fire(Proxy);
+                        local__object.ChildRemoved:Fire(Proxy);
                         Loop__Ancestory__Event(Value,"DescendantRemoved",Proxy);
 
-                        rawset(object__Attr.Parent.__Children,self.ProxyID,nil);
+                        rawset(local__object.Parent.__Children,self.ProxyID,nil);
                         -- Rawset allocates the memory directly
                         self = Proxy;
                     end
                     if Value.Class then 
-                        object__Attr.Parent = Value;
+                        local__object.Parent = Value;
                         Value.__Children[self.ProxyID] = self;
                         Value.ChildAdded:Fire(self);
                         Loop__Ancestory__Event(Value,"DescendantAdded",self);
@@ -345,7 +344,7 @@ local Instance = {
                     end
                 elseif Index == "__Children" then 
                     if Value.Class then 
-                        Instances[self.ID].__Children[Index] = Value;
+                        local__object.__Children[Index] = Value;
                     else
                         error("Unable to add " .. type(Value) .. " to children")
                     end
