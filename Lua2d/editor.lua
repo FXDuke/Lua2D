@@ -22,11 +22,11 @@ Button.BackgroundColor3 = Color3.new(0.3,0.3,0.3);
 Button.TextOpacity = 0.5;
 
 Button.MouseEnter:Connect(function()
-    Tween:Create(Button,TweenInfo.new(0.25,Enumerate.EasingStyle.Sine),{BackgroundColor3=Color3.new(0.3,0.3,0.3),TextOpacity=1,TextColor3=Color3.new(0.5,0.5,0.5)}):Play();
+    Tween:Create(Button,TweenInfo.new(0.25,Enumerate.EasingStyle.Sine),{BackgroundColor3=Color3.new(0,0,0),TextOpacity=1,TextColor3=Color3.new(0.5,0.5,0.5)}):Play();
 end)
 
 Button.MouseLeave:Connect(function()
-    Tween:Create(Button,TweenInfo.new(0.25,Enumerate.EasingStyle.Sine),{BackgroundColor3=Color3.new(0,0,0),TextOpacity=0.5,TextColor3=Color3.new(0,0,0)}):Play();
+    Tween:Create(Button,TweenInfo.new(0.25,Enumerate.EasingStyle.Sine),{BackgroundColor3=Color3.new(0.3,0.3,0.3),TextOpacity=0.5,TextColor3=Color3.new(0,0,0)}):Play();
 end)
 
 

@@ -12,7 +12,7 @@ local function DrawUI(UI,ClipBoundary)
     end 
 
     if ClipBoundary then
-        local local__UI__PROPERTIES = OLD__UI__PROPERTIES;
+        local local__UI__PROPERTIES = OLD__UI__PROPERTIES[UI.ID];
         if ClipBoundary.Position.Y+ClipBoundary.Size.Y < Position.Y or Position.Y+Size.Y < ClipBoundary.Position.Y then 
             if not local__UI__PROPERTIES then 
                 OLD__UI__PROPERTIES[UI.ID] = {
@@ -23,12 +23,12 @@ local function DrawUI(UI,ClipBoundary)
                 UI.Visible = false;
             end
         elseif local__UI__PROPERTIES then
-            UI.Enabled = UI.Enabled == true and true or local__UI__PROPERTIES.Enabled;
-            UI.Visible = UI.Visible == true and true or local__UI__PROPERTIES.Visible;
-            local__UI__PROPERTIES = nil;
+            UI.Enabled = local__UI__PROPERTIES.Enabled;
+            UI.Visible = local__UI__PROPERTIES.Visible;
+            OLD__UI__PROPERTIES[UI.ID] = nil;
         end
 
-        if not UI.Visible then return nil end;
+        if UI.Visible == false then return nil end;
         local PPos = ClipBoundary.Position;
         local PSiz = ClipBoundary.Size; 
 

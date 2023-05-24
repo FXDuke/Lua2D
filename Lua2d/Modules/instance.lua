@@ -19,21 +19,28 @@ local function Loop__Ancestory__Event(Object,Event,Value)
     end
 end
 
-local Trees = {
-    -- To add a type, add an index: [type_name: String] = [class_name: String]
-    -- Then to give it special attributes / properties, go into instance.new and add an if statement
-    -- (that is a temporary solution, will probably be improved later ^)
-    ["Part"] = "WorldObject",
-    ["TextBox"] = "UI",
-    ["UI"] = "UI",
-    ["Object"] = "Object",
-    ["Folder"] = "Object",
-    ["Button"] = "UI",
-    ["ScrollingBox"] = "UI",
-    ["TextButton"] = "UI",
-};
+local function cast__object__attributes(Target,Object)
+    for Index, Value in pairs(Object.__Attributes) do 
+        Target.__Attributes[Index] = Value;
+    end 
+    for Index, Value in pairs(Object.__Events) do 
+        Target.__Events[Index] = createConnection();
+    end 
+    return setmetatable(Target,Object.__index);
+end
 
-local class__Instance = {};
+local class__Instance = {
+    Class = "Object",
+    __Attributes = {},
+    __Events = {
+        ChildAdded = createConnection(),
+        ChildRemoved = createConnection(),
+        DescendantAdded = createConnection(),
+        DescendantRemoved = createConnection(),
+        Destroying = createConnection(),
+        Changed = createConnection(),
+    },
+};
 class__Instance.__index = class__Instance;
 
 function class__Instance:FindFirstChild(Name)
@@ -180,6 +187,180 @@ function class__Instance:ClearChildren()
     end
 end
 
+-- WORLD PART 
+
+local class__WorldObject = cast__object__attributes({
+    Class = "Object",
+    __Attributes = {
+        Position = Vector2.new(0,0);
+        Size = Vector2.new(50,20);
+        Color3 = Color3.new(255,255,255);
+        Opacity = 1;
+    },
+    __Events = {},
+},
+class__Instance);
+
+-- PART
+
+local class__Part = cast__object__attributes({
+    Class = "WorldObject",
+    __Attributes = {},
+    __Events = {},
+},
+class__WorldObject);
+
+-- UI
+
+local class__UI = cast__object__attributes({
+    Class = "UI",
+    __Attributes = {
+        Position = UDim2.new(0,0,0,0); 
+        Size = UDim2.new(0,50,0,50);
+        AbsolutePosition = Vector2.new(0,0);
+        AbsoluteSize = Vector2.new(50,50); 
+        ZIndexBehavior = Enumerate.ZIndexBehavior.Sibling;
+        Enabled = true;
+        Visible = true;
+        ClipsDescendants = false;
+        BackgroundColor3 = Color3.new(255,255,255);
+        BackgroundOpacity = 1;
+        ZIndex = 1;
+        ScaleType = Enumerate.ScaleType.Sibling;
+    },
+    __Events = {
+        MouseEnter = createConnection();
+        MouseLeave = createConnection();
+    },
+},
+class__Instance);
+class__UI.__index = class__UI;
+
+function class__UI:__Update(Index)
+    local local__Parent = self.Parent;
+    local object__Attr = self.__Attributes;
+    local object__Chil = self.__Children;
+    if local__Parent == nil then return end;
+
+    if (Index == "Position") then
+
+        local Position = object__Attr.Position;
+        local X = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH*Position.X.Scale or local__Parent.AbsolutePosition.X+local__Parent.AbsoluteSize.X*Position.X.Scale;
+        local Y = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT*Position.Y.Scale or local__Parent.AbsolutePosition.Y+local__Parent.AbsoluteSize.Y*Position.Y.Scale;
+
+        object__Attr.AbsolutePosition = Vector2.new(Position.X.Offset+X, Position.Y.Offset+Y);
+
+        for _,local__Child in pairs(object__Chil) do 
+            local__Child:__Update("Position");
+        end
+
+        return;
+    elseif (Index == "Size") then 
+
+        local Size = object__Attr.Size;
+        local X = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH or local__Parent.AbsoluteSize.X;
+        local Y = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT or local__Parent.AbsoluteSize.Y;
+
+        object__Attr.AbsoluteSize = Vector2.new(Size.X.Offset+X*Size.X.Scale,Size.Y.Offset+Y*Size.Y.Scale);
+        for _,local__Child in pairs(object__Chil) do 
+            local__Child:__Update("Size");
+        end
+
+        return;
+    elseif (Index == "CanvasSize") then 
+
+        local Size = object__Attr.CanvasSize;
+        local X = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH or local__Parent.AbsoluteSize.X;
+        local Y = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT or local__Parent.AbsoluteSize.Y;
+
+        object__Attr.AbsoluteCanvasSize = Vector2.new(Size.X.Offset+X*Size.X.Scale,Size.Y.Offset+Y*Size.Y.Scale);
+        for _,local__Child in pairs(object__Chil) do 
+            local__Child:__Update("Size");
+        end
+
+        return;
+    elseif (Index == "ZIndex") then
+
+        Update_Draw_Order();
+
+        return;
+    end
+end
+
+-- BUTTON
+
+local class__Button = cast__object__attributes({
+    Class = "UI",
+    __Attributes = {},
+    __Events = {
+        Button1Down = createConnection();
+        Button2Down = createConnection();
+        Button1Up = createConnection();
+        Button2Up = createConnection();
+    },
+},
+class__UI);
+
+-- TEXT BOX
+
+local class__TextBox = cast__object__attributes({
+    Class = "UI",
+    __Attributes = {
+        Text = "Textbox";
+        TextOpacity = 1;
+        TextScaled = true; -- need to add behavior for false
+        TextColor3 = Color3.new(0,0,0);
+        FontSize = 14; -- Need to add font size to ui_drawing
+    },
+    __Events = {},
+},
+class__UI);
+
+-- TEXT BUTTON
+
+local class__TextButton = cast__object__attributes({
+    Class = "UI", 
+    __Attributes = {
+        Text = "TextButton";
+        TextOpacity = 1;
+        TextScaled = true; -- need to add behavior for false
+        TextColor3 = Color3.new(0,0,0);
+        FontSize = 14; -- Need to add font size to ui_drawing
+    },
+    __Events = {},
+},
+class__Button);
+
+-- SCROLLING BOX 
+
+local class__ScrollingBox = cast__object__attributes({
+    Class = "UI", 
+    __Attributes = {
+        CanvasSize = UDim2.new(0,500,0,300);
+        CanvasPosition = Vector2.new(0,0);
+        AbsoluteCanvasSize = Vector2.new(500,300);
+        ClipsDescendants = true;
+    },
+    __Events = {},
+},
+class__UI)
+
+local Trees = {
+    -- To add a type, add an index: [type_name: String] = [class_name: String]
+    -- Then to give it special attributes / properties, go into instance.new and add an if statement
+    -- (that is a temporary solution, will probably be improved later ^)
+    ["Part"] = class__Part,
+    ["TextBox"] = class__TextBox,
+    ["UI"] = class__UI,
+    ["WorldObject"] = class__WorldObject,
+    ["Object"] = class__Instance,
+    ["Folder"] = class__Instance,
+    ["Button"] = class__Button,
+    ["ScrollingBox"] = class__ScrollingBox,
+    ["TextButton"] = class__TextButton,
+};
+
+
 local Instance = {
     Update_Draw_Order = Update_Draw_Order,
     getInstances = function()
@@ -189,32 +370,24 @@ local Instance = {
         return DrawOrder;
     end,
     new = function(Type)
-
+        
+        if not Trees[Type] then return error(Type .. " is not a valid Instance class.") end;
         Instance__INDEX = Instance__INDEX + 1;
-
-        -- Applying Root Class
-
-        Type = Type or "Folder";
-        local Branch = Trees[Type];
-
+        
+        local class = Trees[Type];
         local ID = Instance__INDEX;
-        Instances[ID] = setmetatable({
+
+        Instances[ID] = cast__object__attributes({ -- Applying Root Class
             Type = Type,
-            Class = Branch,
-            ID = ID,
+            Class = class.Class,
             Parent = nil,
-            __Children = {},
+            ID = ID,
             __Attributes = {
+                Name = Type,
             },
-            __Events = {
-                ChildAdded = createConnection(),
-                ChildRemoved = createConnection(),
-                DescendantAdded = createConnection(),
-                DescendantRemoved = createConnection(),
-                Destroying = createConnection(),
-                Changed = createConnection(),
-            },
-        },class__Instance);
+            __Events = {},
+            __Children = {},
+        },class);
         Instances[ID].__index = Instances[ID];
 
         -- Applying Class
@@ -222,114 +395,7 @@ local Instance = {
         local object__Attr = local__object.__Attributes;
         local object__Evnt = local__object.__Events;
         local object__Chil = local__object.__Children;
-        object__Attr.Class = Branch;
-        object__Attr.Name = Type;
-
-        if Branch == "WorldObject" then 
-
-            -- Attributes 
-
-            object__Attr.Position = Vector2.new(0,0);
-            object__Attr.Size = Vector2.new(50,20);
-            object__Attr.Color3 = Color3.new(255,255,255);
-            object__Attr.Opacity = 1;
-
-        elseif Branch == "UI" then
-
-            -- Attributes
-
-            object__Attr.Position = UDim2.new(0,0,0,0); 
-            object__Attr.Size = UDim2.new(0,50,0,50);
-            object__Attr.AbsolutePosition = Vector2.new(0,0);
-            object__Attr.AbsoluteSize = Vector2.new(50,50); 
-            object__Attr.ZIndexBehavior = Enumerate.ZIndexBehavior.Sibling;
-            object__Attr.Enabled = true;
-            object__Attr.Visible = true;
-            object__Attr.ClipsDescendants = false;
-            object__Attr.BackgroundColor3 = Color3.new(255,255,255);
-            object__Attr.BackgroundOpacity = 1;
-            object__Attr.ZIndex = 1;
-            object__Attr.ScaleType = Enumerate.ScaleType.Sibling;
-
-            -- Events
-
-            object__Evnt.MouseEnter = createConnection();
-            object__Evnt.MouseLeave = createConnection();
-            object__Evnt.Changed:Connect(function(self, Index)
-                if (Index == "Position") and local__object.Parent then
-
-                    local Position = object__Attr.Position;
-                    local X = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH*Position.X.Scale or local__object.Parent.AbsolutePosition.X+local__object.Parent.AbsoluteSize.X*Position.X.Scale;
-                    local Y = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT*Position.Y.Scale or local__object.Parent.AbsolutePosition.Y+local__object.Parent.AbsoluteSize.Y*Position.Y.Scale;
-
-                    object__Attr.AbsolutePosition = Vector2.new(Position.X.Offset+X, Position.Y.Offset+Y);
-                    for _,Child in pairs(object__Chil) do 
-                        Child.Changed:Fire("Position");
-                    end
-
-                    return;
-                elseif (Index == "Size") and local__object.Parent then 
-
-                    local Size = object__Attr.Size;
-                    local X = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH or local__object.Parent.AbsoluteSize.X;
-                    local Y = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT or local__object.Parent.AbsoluteSize.Y;
-
-                    object__Attr.AbsoluteSize = Vector2.new(Size.X.Offset+X*Size.X.Scale,Size.Y.Offset+Y*Size.Y.Scale);
-                    for _,Child in pairs(object__Chil) do 
-                        Child.Changed:Fire("Size");
-                    end
-
-                    return;
-                elseif (Index == "CanvasSize") and local__object.Parent then 
-
-                    local Size = object__Attr.CanvasSize;
-                    local X = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_WIDTH or local__object.Parent.AbsoluteSize.X;
-                    local Y = (object__Attr.ScaleType == Enumerate.ScaleType.Global) and WINDOW_HEIGHT or local__object.Parent.AbsoluteSize.Y;
-            
-                    object__Attr.AbsoluteCanvasSize = Vector2.new(Size.X.Offset+X*Size.X.Scale,Size.Y.Offset+Y*Size.Y.Scale);
-                    for _,Child in pairs(object__Chil) do 
-                        Child.Changed:Fire("Size");
-                    end
-
-                    return;
-                elseif (Index == "ZIndex") then
-
-                    Update_Draw_Order();
-
-                    return;
-                end
-            end)
-
-            -- Branch Attributes / Events 
-
-            if Type == "TextBox" or Type == "TextButton" then 
-
-                object__Attr.Text = "Textbox";
-                object__Attr.TextOpacity = 1;
-                object__Attr.TextScaled = true; -- need to add behavior for false
-                object__Attr.TextColor3 = Color3.new(0,0,0);
-                object__Attr.FontSize = 14; -- Need to add font size to ui_drawing
-
-            end
-            if Type == "Button" or Type == "TextButton" then 
-
-                object__Evnt.Button1Down = createConnection();
-                object__Evnt.Button2Down = createConnection();
-                object__Evnt.Button1Up = createConnection();
-                object__Evnt.Button2Up = createConnection();
-
-            end
-            if Type == "ScrollingBox" then 
-
-                object__Attr.CanvasSize = UDim2.new(0,500,0,300);
-                object__Attr.CanvasPosition = Vector2.new(0,0);
-                object__Attr.AbsoluteCanvasSize = Vector2.new(500,300);
-                object__Attr.ClipsDescendants = true;
-
-            end
-
-        end 
-
+    
         -- Creating Proxy
 
         local__object.__Proxy = setmetatable({
@@ -341,10 +407,10 @@ local Instance = {
                         return object__Attr[Index];
                     elseif object__Evnt[Index] then -- returns the event with the index passed
                         return object__Evnt[Index];
-                    elseif local__object:FindFirstChild(Index) then -- returns the child with the index passed (if a child is found)
+                    elseif local__object:FindFirstChild(Index) then 
                         return local__object:FindFirstChild(Index);
-                    else
-                        return local__object.__index[Index];
+                    elseif local__object[Index] then 
+                        return local__object[Index];
                     end
                 else
                     return nil;
@@ -353,7 +419,7 @@ local Instance = {
             __newindex = function(self,Index,Value)
                 if Index == "Parent" then 
                     if local__object.Parent then 
-                        local Proxy = setmetatable({ID=self.ID,ProxyID=self.ProxyID},self);
+                        local Proxy = setmetatable({ProxyID=self.ProxyID},self);
                         -- Creates a clone of the proxy so the current one's memory can be cleared
                         local__object.ChildRemoved:Fire(Proxy);
                         Loop__Ancestory__Event(Value,"DescendantRemoved",Proxy);
@@ -363,33 +429,40 @@ local Instance = {
                         self = Proxy;
                     end
                     if Value.Class then 
+                       
                         local__object.Parent = Value;
                         Value.__Children[self.ProxyID] = self;
+
                         Value.ChildAdded:Fire(self);
+                        
                         Loop__Ancestory__Event(Value,"DescendantAdded",self);
-                        object__Evnt.Changed:Fire("Position");
-                        object__Evnt.Changed:Fire("Size");
+         
                         -- Updates the Object's Size and Position to become relative to the new parent
                     else
                         error("Parent must be an instance");
                     end
                 elseif Index == "__Children" then 
-                    if Value.Class then 
+                    if Value.Class then
                         local__object.__Children[Index] = Value;
                     else
                         error("Unable to add " .. type(Value) .. " to children")
                     end
-                elseif object__Attr[Index] ~= nil then 
+                elseif object__Attr[Index] then 
                     -- If the attribute exists, it changes the value.
                     -- This prevents new values from being added to the main object 
                     -- but allows already present values to be changed.
                     object__Attr[Index] = Value;
-                    self.Changed:Fire(Index);
+                    if local__object.Class == "UI" then 
+                        local__object:__Update(Index);
+                    end
+                    object__Evnt.Changed:Fire(Index);
+                    
                 elseif object__Evnt[Index] then
                     error("Cannot set value of event");
                 end
                 rawset(self,Index,nil);
                 -- directly clears the index from the proxy table
+                return;
             end,
             __tostring = function(self)
                 return self.Type;

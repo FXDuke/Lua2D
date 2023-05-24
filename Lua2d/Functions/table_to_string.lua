@@ -13,7 +13,7 @@ local function table_to_string(Table,Name)
             if Type(Data) == "table" and not Printed[Data] then
                 Printed[Data] = true; 
                 if Data.Class then 
-                    result = result .. Indentation .. _ .. ' = ' .. Data.Name .. ",\n";
+                    result = result .. Indentation .. _ .. ' = ' .. tostring(Data) .. ",\n";
                 elseif Data.__Connections then 
                     result = result .. Indentation .. _ .. ' = ' .. "Event" .. ",\n";
                 elseif Data.Type then 

@@ -69,6 +69,10 @@ local function ADD_DYNAMIC_STUDIO_UI(Object)
         Tween:Create(clone__Header,TweenInfo.new(0.1,Enumerate.EasingStyle.Sine),{TextOpacity=0.5}):Play();
     end)
 
+    Object.DescendantAdded:Connect(function()
+        MAINTAIN_UI_FORMAT();
+    end)
+
     local Mouse__Held = false;
     local Button1Press = clone__Header.Button1Down:Connect(function()
         Mouse__Held = true;
@@ -91,9 +95,11 @@ local function ADD_DYNAMIC_STUDIO_UI(Object)
                 -- Size Constraint; UI_Service Object cannot be smaller than 0.1 Scale
                 Object.Position = Object.Position + UDim2.new(oX,0,oY,0);
                 Object.Size = Object.Size + UDim2.new(-oX,0,oY,0);
+                
                 MAINTAIN_UI_FORMAT();
+
                 Old_Position = New_Position;
-            until not Held;
+            until not Mouse__Held;
 
             Object.ZIndex = Object.ZIndex - 1;
 
@@ -117,6 +123,7 @@ end
 
 for _,Object in pairs(Layout) do
     ADD_DYNAMIC_STUDIO_UI(Object);  
+    MAINTAIN_UI_FORMAT();
 end
 
 ui_service.ChildAdded:Connect(function(self,Object)

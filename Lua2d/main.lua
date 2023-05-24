@@ -59,6 +59,7 @@ ui_service.Parent = game;
 ui_service.BackgroundOpacity = 0;
 ui_service.Size = UDim2.new(1,0,1,0);
 
+
 config = require("Modules/config");
 
 Tween = require("Modules/tween");
@@ -90,18 +91,22 @@ love.graphics.setBackgroundColor(1,1,1);
 local function draw__UI__Children(UI,Boundary)
     -- Boundary is for ClipsDescendants
     for _,Instance in pairs(UI:GetChildren()) do 
+       
         if Instance.Class == "UI" then 
+       
             UI_Drawing[Instance.Type](Instance,Boundary);
             local Boundary = Boundary or {Position=Instance.AbsolutePosition,Size=Instance.AbsoluteSize};
             local NewBoundary = Boundary;
+            
             if Instance.ClipsDescendants then 
                 NewBoundary.Position.X = Boundary.Position.X < Instance.AbsolutePosition.X and Instance.AbsolutePosition.X or Boundary.Position.X;
                 NewBoundary.Position.Y = Boundary.Position.Y > Instance.AbsolutePosition.Y and Instance.AbsolutePosition.Y or Boundary.Position.Y;
                 NewBoundary.Size.X = Boundary.Size.X > Instance.AbsoluteSize.X and Instance.AbsoluteSize.X or Boundary.Size.X;
                 NewBoundary.Size.Y = Boundary.Size.Y > Instance.AbsoluteSize.Y and Instance.AbsoluteSize.Y or Boundary.Size.Y;
             end
-            
+
             draw__UI__Children(Instance,NewBoundary);
+            
         end
     end
 end
@@ -109,8 +114,9 @@ local dt =0;
 function love.draw()
     for _,ZIndex in pairs(Instance.getDrawOrder()) do 
         -- Draw Order is a table updated every time an instance under the UI Class's ZIndex changes
-        for _,Instance in ipairs(ZIndex) do 
-            if Instance.Class == "UI" then
+        for _,Instance in pairs(ZIndex) do
+
+            if Instance.Class == "UI" then  
                 UI_Drawing[Instance.Type](Instance);
             end
             draw__UI__Children(Instance,Instance.ClipsDescendants and {Position=Instance.AbsolutePosition,Size=Instance.AbsoluteSize});
@@ -204,8 +210,8 @@ function love.resize(Width, Height)
    WINDOW_HEIGHT = Height;
    ui_service.AbsoluteSize = Vector2.new(WINDOW_WIDTH,WINDOW_HEIGHT);
    for _,UIObject in pairs(ui_service:GetChildren()) do
-        UIObject.Changed:Fire("Position");
-        UIObject.Changed:Fire("Size");
+        UIObject:__Update("Position");
+        UIObject:__Update("Size");
    end
 end
 
