@@ -77,11 +77,11 @@ local Connections_Module = {
 				return Connections[ID];
 			end
 		until os.clock() > Limit;
-		error("Possible infinite yield for Connection (" .. ID .. ")", debug.traceback());
+		error("Possible infinite yield for Connection (" .. ID .. ")");
 		return {};
 	end,
 	getConnection = function(ID)
-		if not (ID and Connections[ID]) then error("Connection ("..ID..") not found", debug.traceback()) return end;
+		if not (ID and Connections[ID]) then error("Connection ("..ID..") not found") return end;
 		return Connections[ID];
 	end,
 	createConnection = function(ID)
@@ -89,7 +89,7 @@ local Connections_Module = {
             NO_ID_INDEX = NO_ID_INDEX + 1;
             ID = NO_ID_INDEX;
         end
-		if Connections[ID] then error("Connection (" .. ID .. ") already exists", debug.traceback()) return end;
+		if Connections[ID] then error("Connection (" .. ID .. ") already exists") return end;
 		Connections[ID] = setmetatable({
 			Size = 0,
 			__Connections = {},	
